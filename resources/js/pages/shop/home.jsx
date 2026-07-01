@@ -1,0 +1,57 @@
+import { Head, Link } from '@inertiajs/react';
+
+export default function ShopHome({ auth }) {
+    return (
+        <>
+            <Head title="Morocco Shop" />
+
+            <main className="min-h-screen bg-slate-50 text-slate-900">
+                <header className="border-b bg-white">
+                    <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+                        <Link href="/" className="text-xl font-black">
+                            Morocco Shop
+                        </Link>
+
+                        <div className="flex items-center gap-4">
+                            {auth?.user ? (
+                                <Link
+                                    href="/dashboard"
+                                    className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                                >
+                                    My Account
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link href="/login" className="text-sm font-semibold text-slate-700">
+                                        Log in
+                                    </Link>
+
+                                    <Link
+                                        href="/register"
+                                        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                                    >
+                                        Create account
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </header>
+
+                <section className="mx-auto max-w-6xl px-6 py-24">
+                    <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-emerald-600">
+                        Cash on Delivery · Morocco
+                    </p>
+
+                    <h1 className="max-w-3xl text-5xl font-black leading-tight">
+                        Order online. Confirm on WhatsApp. Pay at delivery.
+                    </h1>
+
+                    <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+                        Browse products, place your order without an account, then confirm it on WhatsApp.
+                    </p>
+                </section>
+            </main>
+        </>
+    );
+}
