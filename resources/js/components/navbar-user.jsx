@@ -24,8 +24,8 @@ const profileStats = {
     xpProgress: 68,
 };
 const fallbackUser = {
-    name: 'Local Coach',
-    email: 'local-coach@example.test',
+    name: 'Shop Owner',
+    email: 'shop-owner@example.test',
     avatar: '',
 };
 

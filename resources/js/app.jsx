@@ -1,41 +1,28 @@
-import { createInertiaApp } from '@inertiajs/react';
-import { Toaster } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { initializeTheme } from '@/hooks/use-appearance';
-import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
+import '../css/app.css';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+import { createInertiaApp } from '@inertiajs/react';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { createRoot } from 'react-dom/client';
+import { initializeTheme } from './hooks/use-appearance';
+
+const appName = import.meta.env.VITE_APP_NAME || 'Morocco Shop';
 
 createInertiaApp({
-  title: (title) => title ? `${title} - ${appName}` : appName,
-  layout: (name) => {
-    switch (true) {
-      case name.startsWith('welcome'):
-        return null;
-      case name.startsWith('courses/'):
-        return null;
-      case name.startsWith('classes/'):
-        return null;
-      case name.startsWith('settings/'):
-        return [AppLayout, SettingsLayout];
-      default:
-        return AppLayout;
-    }
-  },
-  strictMode: true,
-  withApp(app) {
-    return (
-      <TooltipProvider delayDuration={0}>
-        {app}
-        <Toaster />
-      </TooltipProvider>);
+    title: (title) => (title ? `${title} - ${appName}` : appName),
 
-  },
-  progress: {
-    color: '#4B5563'
-  }
+    resolve: (name) =>
+        resolvePageComponent(
+            `./pages/${name}.jsx`,
+            import.meta.glob('./pages/**/*.jsx'),
+        ),
+
+    setup({ el, App, props }) {
+        createRoot(el).render(<App {...props} />);
+    },
+
+    progress: {
+        color: '#111827',
+    },
 });
 
-// This will set light / dark mode on load...
 initializeTheme();
