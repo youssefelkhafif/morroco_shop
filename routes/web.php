@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\DeliveryZoneController;
+use App\Http\Controllers\Admin\OrderController;
 
 Route::inertia('/', 'shop/home')->name('home');
 
@@ -31,6 +32,20 @@ Route::middleware(['auth', 'admin'])
 
         Route::resource('delivery-zones', DeliveryZoneController::class)
             ->except('show');
+
+        Route::get('orders', [OrderController::class, 'index'])
+            ->name('orders.index');
+
+        Route::get('orders/{order}', [OrderController::class, 'show'])
+            ->name('orders.show');
+
+        Route::post('orders/{order}/confirm', [OrderController::class, 'confirm'])
+            ->name('orders.confirm');
+
+        Route::get(
+            'orders/{order}/transport-pdf',
+            [OrderController::class, 'transportPdf'],
+        )->name('orders.transport-pdf');
     });
 
 require __DIR__ . '/auth.php';
