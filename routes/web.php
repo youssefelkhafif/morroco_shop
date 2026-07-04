@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\CategoryController;
 
 Route::inertia('/', 'shop/home')->name('home');
 
@@ -13,6 +14,7 @@ Route::middleware(['auth', 'admin'])
     ->as('admin.')
     ->group(function () {
         Route::inertia('/', 'admin/dashboard')->name('dashboard');
+        Route::resource('categories', CategoryController::class)->except('show');
     });
 
 require __DIR__.'/auth.php';

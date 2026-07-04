@@ -28,14 +28,19 @@ export default function AdminDashboard() {
 
                     <section className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
                         <h2 className="text-lg font-semibold text-card-foreground">
-                            Admin foundation ready
+                            Catalog management
                         </h2>
 
                         <p className="mt-2 text-sm text-muted-foreground">
-                            Categories, products, stock, delivery zones, orders,
-                            customers, and analytics will be added here in
-                            separate stages.
+                            Start by creating categories. Products will use these categories later.
                         </p>
+
+                        <Link
+                            href="/admin/categories"
+                            className="mt-5 inline-flex rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+                        >
+                            Manage categories
+                        </Link>
                     </section>
                 </div>
             </main>
