@@ -7,10 +7,12 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
+use App\Services\ProductImageService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Services\ProductImageService;
 
 class ProductController extends Controller
 {
@@ -59,6 +61,8 @@ class ProductController extends Controller
 
     public function edit(Product $product): Response
     {
+        $product->load('images');
+
         return Inertia::render('admin/products/edit', [
             'product' => [
                 'id' => $product->id,
@@ -71,6 +75,14 @@ class ProductController extends Controller
                 'stock_quantity' => $product->stock_quantity,
                 'is_active' => $product->is_active,
                 'is_featured' => $product->is_featured,
+                'images' => $product->images
+                    ->map(fn(ProductImage $image) => [
+                        'id' => $image->id,
+                        'url' => Storage::disk('public')->url($image->path),
+                        'sort_order' => $image->sort_order,
+                    ])
+                    ->values()
+                    ->all(),
             ],
             'categories' => $this->categoriesForForm(),
         ]);
