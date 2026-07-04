@@ -10,6 +10,7 @@ use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Services\ProductImageService;
 
 class ProductController extends Controller
 {
@@ -20,7 +21,7 @@ class ProductController extends Controller
             ->withCount('images')
             ->latest()
             ->paginate(15)
-            ->through(fn (Product $product) => [
+            ->through(fn(Product $product) => [
                 'id' => $product->id,
                 'category' => [
                     'id' => $product->category->id,
@@ -85,8 +86,12 @@ class ProductController extends Controller
             ->with('success', 'Product updated successfully.');
     }
 
-    public function destroy(Product $product): RedirectResponse
-    {
+    public function destroy(
+        Product $product,
+        ProductImageService $productImages,
+    ): RedirectResponse {
+        $productImages->deleteAllForProduct($product);
+
         $product->delete();
 
         return to_route('admin.products.index')
@@ -99,7 +104,7 @@ class ProductController extends Controller
             ->orderByDesc('is_active')
             ->orderBy('name')
             ->get(['id', 'name', 'is_active'])
-            ->map(fn (Category $category) => [
+            ->map(fn(Category $category) => [
                 'id' => $category->id,
                 'name' => $category->name,
                 'is_active' => $category->is_active,
