@@ -7,7 +7,17 @@ import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Morocco Shop';
 
+const appElement = document.getElementById('app');
+
+if (!appElement?.dataset.page) {
+    throw new Error('Inertia initial page data is missing from #app.');
+}
+
+const initialPage = JSON.parse(appElement.dataset.page);
+
 createInertiaApp({
+    page: initialPage,
+
     title: (title) => (title ? `${title} - ${appName}` : appName),
 
     resolve: (name) =>
