@@ -7,7 +7,10 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
+use App\Services\ProductImageService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,7 +23,7 @@ class ProductController extends Controller
             ->withCount('images')
             ->latest()
             ->paginate(15)
-            ->through(fn (Product $product) => [
+            ->through(fn(Product $product) => [
                 'id' => $product->id,
                 'category' => [
                     'id' => $product->category->id,
@@ -58,6 +61,8 @@ class ProductController extends Controller
 
     public function edit(Product $product): Response
     {
+        $product->load('images');
+
         return Inertia::render('admin/products/edit', [
             'product' => [
                 'id' => $product->id,
@@ -70,6 +75,14 @@ class ProductController extends Controller
                 'stock_quantity' => $product->stock_quantity,
                 'is_active' => $product->is_active,
                 'is_featured' => $product->is_featured,
+                'images' => $product->images
+                    ->map(fn(ProductImage $image) => [
+                        'id' => $image->id,
+                        'url' => Storage::disk('public')->url($image->path),
+                        'sort_order' => $image->sort_order,
+                    ])
+                    ->values()
+                    ->all(),
             ],
             'categories' => $this->categoriesForForm(),
         ]);
@@ -85,8 +98,12 @@ class ProductController extends Controller
             ->with('success', 'Product updated successfully.');
     }
 
-    public function destroy(Product $product): RedirectResponse
-    {
+    public function destroy(
+        Product $product,
+        ProductImageService $productImages,
+    ): RedirectResponse {
+        $productImages->deleteAllForProduct($product);
+
         $product->delete();
 
         return to_route('admin.products.index')
@@ -99,7 +116,7 @@ class ProductController extends Controller
             ->orderByDesc('is_active')
             ->orderBy('name')
             ->get(['id', 'name', 'is_active'])
-            ->map(fn (Category $category) => [
+            ->map(fn(Category $category) => [
                 'id' => $category->id,
                 'name' => $category->name,
                 'is_active' => $category->is_active,
