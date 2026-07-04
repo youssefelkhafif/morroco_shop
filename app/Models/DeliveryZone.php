@@ -11,6 +11,8 @@ class DeliveryZone extends Model
 
     protected $fillable = [
         'city',
+        'district',
+        'zone_name',
         'delivery_fee_mad',
         'estimated_delivery_days',
         'is_active',

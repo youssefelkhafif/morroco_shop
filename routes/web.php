@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
+use App\Http\Controllers\Admin\DeliveryZoneController;
 
 Route::inertia('/', 'shop/home')->name('home');
 
@@ -27,6 +28,9 @@ Route::middleware(['auth', 'admin'])
             'products/{product}/images/{image}',
             [ProductImageController::class, 'destroy'],
         )->name('products.images.destroy');
+
+        Route::resource('delivery-zones', DeliveryZoneController::class)
+            ->except('show');
     });
 
 require __DIR__ . '/auth.php';
