@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import ProductForm from '@/components/admin/product-form';
+import ProductImageManager from '@/components/admin/product-image-manager';
 
 export default function EditProduct({ product, categories }) {
     return (
@@ -25,7 +26,17 @@ export default function EditProduct({ product, categories }) {
                         </p>
                     </div>
 
-                    <ProductForm product={product} categories={categories} />
+                    <div className="space-y-6">
+                        <ProductForm
+                            product={product}
+                            categories={categories}
+                        />
+
+                        <ProductImageManager
+                            productId={product.id}
+                            images={product.images ?? []}
+                        />
+                    </div>
                 </div>
             </main>
         </>
