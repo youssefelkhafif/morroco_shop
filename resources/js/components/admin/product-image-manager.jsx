@@ -22,6 +22,7 @@ export default function ProductImageManager({
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [clientError, setClientError] = useState('');
     const [deletingId, setDeletingId] = useState(null);
+    const [uploadSuccess, setUploadSuccess] = useState('');
 
     const remainingSlots = Math.max(MAX_IMAGES - images.length, 0);
 
@@ -52,6 +53,7 @@ export default function ProductImageManager({
         const files = Array.from(event.target.files ?? []);
 
         setClientError('');
+        setUploadSuccess('');
         clearErrors('images');
 
         if (files.length === 0) {
@@ -112,7 +114,10 @@ export default function ProductImageManager({
             return;
         }
 
+        const uploadedCount = data.images.length;
+
         setClientError('');
+        setUploadSuccess('');
 
         post(`/admin/products/${productId}/images`, {
             forceFormData: true,
@@ -120,6 +125,14 @@ export default function ProductImageManager({
             onSuccess: () => {
                 reset('images');
                 setSelectedFiles([]);
+
+                setUploadSuccess(
+                    `${uploadedCount} image${uploadedCount === 1 ? '' : 's'
+                    } uploaded successfully.`,
+                );
+            },
+            onError: () => {
+                setUploadSuccess('');
             },
         });
     }
@@ -238,6 +251,12 @@ export default function ProductImageManager({
                             {error}
                         </p>
                     ))}
+
+                    {uploadSuccess && (
+                        <p className="mt-3 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                            {uploadSuccess}
+                        </p>
+                    )}
 
                     {previews.length > 0 && (
                         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
