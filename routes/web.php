@@ -6,8 +6,22 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\DeliveryZoneController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Shop\CartController;
+use App\Http\Controllers\Shop\HomeController;
 
-Route::inertia('/', 'shop/home')->name('home');
+Route::get('/', HomeController::class)->name('home');
+
+Route::get('/cart', [CartController::class, 'index'])
+    ->name('cart.index');
+
+Route::post('/cart/items', [CartController::class, 'store'])
+    ->name('cart.items.store');
+
+Route::patch('/cart/items/{product}', [CartController::class, 'update'])
+    ->name('cart.items.update');
+
+Route::delete('/cart/items/{product}', [CartController::class, 'destroy'])
+    ->name('cart.items.destroy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('/dashboard', 'shop/account/index')->name('dashboard');
