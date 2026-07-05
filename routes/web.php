@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DeliveryZoneController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\HomeController;
+use App\Http\Controllers\Shop\CheckoutController;
 
 Route::get('/', HomeController::class)->name('home');
 
@@ -22,6 +23,12 @@ Route::patch('/cart/items/{product}', [CartController::class, 'update'])
 
 Route::delete('/cart/items/{product}', [CartController::class, 'destroy'])
     ->name('cart.items.destroy');
+
+Route::get('/checkout', [CheckoutController::class, 'index'])
+    ->name('checkout.index');
+
+Route::post('/checkout', [CheckoutController::class, 'store'])
+    ->name('checkout.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('/dashboard', 'shop/account/index')->name('dashboard');
