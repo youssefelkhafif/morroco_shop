@@ -205,9 +205,12 @@ export default function CartIndex({ cart }) {
                                     </p>
                                 </div>
 
-                                <div className="mt-6 rounded-lg bg-muted p-3 text-center text-sm font-medium text-muted-foreground">
-                                    Checkout comes next
-                                </div>
+                                <Link
+                                    href="/checkout"
+                                    className="mt-6 flex w-full justify-center rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+                                >
+                                    Continue to checkout
+                                </Link>
                             </aside>
                         </div>
                     )}
