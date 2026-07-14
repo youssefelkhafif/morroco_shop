@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Services\Orders\OrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
@@ -58,6 +59,23 @@ it('a normal user cannot access admin order management', function () {
         ->assertForbidden();
 });
 
+it('uses the order policy to allow admins and deny regular users', function () {
+    $admin = adminOrdersUser();
+    $user = User::factory()->create([
+        'is_admin' => false,
+    ]);
+    $order = Order::factory()->create();
+
+    expect(Gate::forUser($admin)->check('viewAny', Order::class))->toBeTrue()
+        ->and(Gate::forUser($admin)->check('view', $order))->toBeTrue()
+        ->and(Gate::forUser($admin)->check('confirm', $order))->toBeTrue()
+        ->and(Gate::forUser($admin)->check('cancel', $order))->toBeTrue()
+        ->and(Gate::forUser($user)->check('viewAny', Order::class))->toBeFalse()
+        ->and(Gate::forUser($user)->check('view', $order))->toBeFalse()
+        ->and(Gate::forUser($user)->check('confirm', $order))->toBeFalse()
+        ->and(Gate::forUser($user)->check('cancel', $order))->toBeFalse();
+});
+
 it('an admin can view the order list', function () {
     $order = Order::factory()->create([
         'order_number' => 'MS-20260704-ADMIN1',
@@ -94,6 +112,10 @@ it('an admin can view order details with item and delivery snapshots', function 
         'delivery_district' => 'Anassi',
         'delivery_zone_name' => 'Standard',
         'delivery_address' => '123 Test Street',
+        'preparing_at' => now()->subHour(),
+        'shipped_at' => now()->subMinute(),
+        'delivered_at' => now(),
+        'cancelled_at' => null,
     ]);
 
     OrderItem::factory()
@@ -115,7 +137,11 @@ it('an admin can view order details with item and delivery snapshots', function 
             ->where('order.delivery.district', 'Anassi')
             ->where('order.items.0.product_name', 'Wireless Headphones')
             ->where('order.items.0.quantity', 2)
-            ->where('order.items.0.line_total_mad', '999.98'),
+            ->where('order.items.0.line_total_mad', '999.98')
+            ->where('order.preparing_at', $order->preparing_at->toISOString())
+            ->where('order.shipped_at', $order->shipped_at->toISOString())
+            ->where('order.delivered_at', $order->delivered_at->toISOString())
+            ->where('order.cancelled_at', null),
         );
 });
 
@@ -141,4 +167,75 @@ it('an admin can confirm a pending order through the order management route', fu
     expect($order->fresh()->status)->toBe(Order::STATUS_CONFIRMED)
         ->and($order->fresh()->hasStockBeenDeducted())->toBeTrue()
         ->and($product->fresh()->stock_quantity)->toBe(8);
+});
+
+it('an admin can cancel a pending order through the order management route', function () {
+    $deliveryZone = DeliveryZone::factory()->create([
+        'is_active' => true,
+    ]);
+
+    $product = Product::factory()->create([
+        'is_active' => true,
+        'stock_quantity' => 10,
+        'price_mad' => '100.00',
+    ]);
+
+    $order = app(OrderService::class)->create(
+        adminOrderPayload($deliveryZone, $product),
+    );
+
+    $this->actingAs(adminOrdersUser())
+        ->post(route('admin.orders.cancel', $order))
+        ->assertRedirect(route('admin.orders.show', $order));
+
+    expect($order->fresh()->status)->toBe(Order::STATUS_CANCELLED)
+        ->and($order->fresh()->cancelled_at)->not->toBeNull()
+        ->and($order->fresh()->hasStockBeenDeducted())->toBeFalse()
+        ->and($product->fresh()->stock_quantity)->toBe(10);
+});
+
+it('an admin can advance an order through the workflow and assign carrier details', function () {
+    $deliveryZone = DeliveryZone::factory()->create([
+        'is_active' => true,
+    ]);
+
+    $product = Product::factory()->create([
+        'is_active' => true,
+        'stock_quantity' => 10,
+        'price_mad' => '100.00',
+    ]);
+
+    $service = app(OrderService::class);
+
+    $order = $service->create(
+        adminOrderPayload($deliveryZone, $product),
+    );
+
+    $order = $service->confirm($order);
+
+    $this->actingAs(adminOrdersUser())
+        ->post(route('admin.orders.assign-carrier-tracking', $order), [
+            'carrier_name' => 'Aramex',
+            'tracking_number' => 'TRK-123456',
+        ])
+        ->assertRedirect(route('admin.orders.show', $order));
+
+    $this->actingAs(adminOrdersUser())
+        ->post(route('admin.orders.prepare', $order))
+        ->assertRedirect(route('admin.orders.show', $order));
+
+    $this->actingAs(adminOrdersUser())
+        ->post(route('admin.orders.ship', $order))
+        ->assertRedirect(route('admin.orders.show', $order));
+
+    $this->actingAs(adminOrdersUser())
+        ->post(route('admin.orders.deliver', $order))
+        ->assertRedirect(route('admin.orders.show', $order));
+
+    expect($order->fresh()->status)->toBe(Order::STATUS_DELIVERED)
+        ->and($order->fresh()->carrier_name)->toBe('Aramex')
+        ->and($order->fresh()->tracking_number)->toBe('TRK-123456')
+        ->and($order->fresh()->preparing_at)->not->toBeNull()
+        ->and($order->fresh()->shipped_at)->not->toBeNull()
+        ->and($order->fresh()->delivered_at)->not->toBeNull();
 });

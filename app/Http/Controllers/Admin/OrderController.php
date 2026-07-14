@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\Orders\OrderService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -15,6 +16,8 @@ class OrderController extends Controller
 {
     public function index(): Response
     {
+        Gate::authorize('viewAny', Order::class);
+
         $orders = Order::query()
             ->withCount('items')
             ->latest()
@@ -40,6 +43,8 @@ class OrderController extends Controller
 
     public function show(Order $order): Response
     {
+        Gate::authorize('view', $order);
+
         $order->load([
             'customer',
             'deliveryZone',
@@ -81,8 +86,10 @@ class OrderController extends Controller
 
                 'stock_deducted_at' => $order->stock_deducted_at?->toISOString(),
                 'confirmed_at' => $order->confirmed_at?->toISOString(),
+                'preparing_at' => $order->preparing_at?->toISOString(),
                 'shipped_at' => $order->shipped_at?->toISOString(),
                 'delivered_at' => $order->delivered_at?->toISOString(),
+                'cancelled_at' => $order->cancelled_at?->toISOString(),
 
                 'created_at' => $order->created_at->toISOString(),
 
@@ -122,9 +129,74 @@ class OrderController extends Controller
         Order $order,
         OrderService $orderService,
     ): RedirectResponse {
+        Gate::authorize('confirm', $order);
+
         $orderService->confirm($order);
 
         return to_route('admin.orders.show', $order)
             ->with('success', 'Order confirmed and stock deducted.');
+    }
+
+    public function cancel(
+        Order $order,
+        OrderService $orderService,
+    ): RedirectResponse {
+        Gate::authorize('cancel', $order);
+
+        $orderService->cancel($order);
+
+        return to_route('admin.orders.show', $order)
+            ->with('success', 'Order cancelled.');
+    }
+
+    public function prepare(
+        Order $order,
+        OrderService $orderService,
+    ): RedirectResponse {
+        Gate::authorize('prepare', $order);
+
+        $orderService->markPreparing($order);
+
+        return to_route('admin.orders.show', $order)
+            ->with('success', 'Order marked as preparing.');
+    }
+
+    public function ship(
+        Order $order,
+        OrderService $orderService,
+    ): RedirectResponse {
+        Gate::authorize('ship', $order);
+
+        $orderService->markShipped($order);
+
+        return to_route('admin.orders.show', $order)
+            ->with('success', 'Order marked as shipped.');
+    }
+
+    public function deliver(
+        Order $order,
+        OrderService $orderService,
+    ): RedirectResponse {
+        Gate::authorize('deliver', $order);
+
+        $orderService->markDelivered($order);
+
+        return to_route('admin.orders.show', $order)
+            ->with('success', 'Order marked as delivered.');
+    }
+
+    public function assignCarrierAndTracking(
+        Order $order,
+        OrderService $orderService,
+    ): RedirectResponse {
+        Gate::authorize('assignCarrierAndTracking', $order);
+
+        $carrierName = trim((string) request()->string('carrier_name'));
+        $trackingNumber = trim((string) request()->string('tracking_number'));
+
+        $orderService->assignCarrierAndTracking($order, $carrierName, $trackingNumber);
+
+        return to_route('admin.orders.show', $order)
+            ->with('success', 'Carrier and tracking details updated.');
     }
 }

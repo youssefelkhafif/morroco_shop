@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
+import AdminSidebar from '@/components/admin/admin-sidebar';
 
 const formatMad = (amount) => `${Number(amount).toFixed(2)} MAD`;
 
@@ -26,9 +27,11 @@ export default function ProductsIndex({ products }) {
         <>
             <Head title="Products" />
 
-            <main className="min-h-screen bg-background p-6 text-foreground">
-                <div className="mx-auto max-w-7xl">
-                    <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="min-h-screen bg-background text-foreground">
+                <div className="flex min-h-screen flex-col lg:flex-row">
+                    <main className="flex-1 p-6">
+                        <div className="mx-auto max-w-7xl">
+                            <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
                         <div>
                             <p className="text-sm font-medium text-muted-foreground">
                                 Morocco Shop / Admin
@@ -187,37 +190,41 @@ export default function ProductsIndex({ products }) {
                         )}
                     </section>
 
-                    {(products.prev_page_url || products.next_page_url) && (
-                        <div className="mt-6 flex items-center justify-between">
-                            {products.prev_page_url ? (
-                                <Link
-                                    href={products.prev_page_url}
-                                    className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
-                                >
-                                    Previous
-                                </Link>
-                            ) : (
-                                <span />
-                            )}
+                        {(products.prev_page_url || products.next_page_url) && (
+                            <div className="mt-6 flex items-center justify-between">
+                                {products.prev_page_url ? (
+                                    <Link
+                                        href={products.prev_page_url}
+                                        className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
+                                    >
+                                        Previous
+                                    </Link>
+                                ) : (
+                                    <span />
+                                )}
 
-                            <span className="text-sm text-muted-foreground">
-                                Page {products.current_page} of {products.last_page}
-                            </span>
+                                <span className="text-sm text-muted-foreground">
+                                    Page {products.current_page} of {products.last_page}
+                                </span>
 
-                            {products.next_page_url ? (
-                                <Link
-                                    href={products.next_page_url}
-                                    className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
-                                >
-                                    Next
-                                </Link>
-                            ) : (
-                                <span />
-                            )}
+                                {products.next_page_url ? (
+                                    <Link
+                                        href={products.next_page_url}
+                                        className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
+                                    >
+                                        Next
+                                    </Link>
+                                ) : (
+                                    <span />
+                                )}
+                            </div>
+                        )}
                         </div>
-                    )}
+                    </main>
+
+                    <AdminSidebar currentPath="/admin/products" />
                 </div>
-            </main>
+            </div>
         </>
     );
 }

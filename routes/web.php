@@ -63,6 +63,23 @@ Route::middleware(['auth', 'admin'])
         Route::post('orders/{order}/confirm', [OrderController::class, 'confirm'])
             ->name('orders.confirm');
 
+        Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])
+            ->name('orders.cancel');
+
+        Route::post('orders/{order}/prepare', [OrderController::class, 'prepare'])
+            ->name('orders.prepare');
+
+        Route::post('orders/{order}/ship', [OrderController::class, 'ship'])
+            ->name('orders.ship');
+
+        Route::post('orders/{order}/deliver', [OrderController::class, 'deliver'])
+            ->name('orders.deliver');
+
+        Route::post(
+            'orders/{order}/carrier-tracking',
+            [OrderController::class, 'assignCarrierAndTracking'],
+        )->name('orders.assign-carrier-tracking');
+
         Route::get(
             'orders/{order}/transport-pdf',
             [OrderController::class, 'transportPdf'],
