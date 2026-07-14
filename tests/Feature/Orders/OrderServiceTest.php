@@ -292,6 +292,143 @@ it('rechecks stock during confirmation and keeps the order pending when stock be
         ->and($product->fresh()->stock_quantity)->toBe(2);
 });
 
+it('cancels a pending order without changing stock', function () {
+    $deliveryZone = DeliveryZone::factory()->create([
+        'is_active' => true,
+    ]);
+
+    $product = Product::factory()->create([
+        'stock_quantity' => 5,
+        'is_active' => true,
+    ]);
+
+    $service = app(OrderService::class);
+
+    $order = $service->create(
+        orderServicePayload($deliveryZone, [
+            [
+                'product_id' => $product->id,
+                'quantity' => 2,
+            ],
+        ]),
+    );
+
+    $cancelledOrder = $service->cancel($order);
+
+    expect($cancelledOrder->status)->toBe(Order::STATUS_CANCELLED)
+        ->and($cancelledOrder->cancelled_at)->not->toBeNull()
+        ->and($order->fresh()->status)->toBe(Order::STATUS_CANCELLED)
+        ->and($product->fresh()->stock_quantity)->toBe(5);
+});
+
+it('tracks the order lifecycle through preparing, shipped, and delivered statuses', function () {
+    $deliveryZone = DeliveryZone::factory()->create([
+        'is_active' => true,
+    ]);
+
+    $product = Product::factory()->create([
+        'stock_quantity' => 5,
+        'is_active' => true,
+    ]);
+
+    $service = app(OrderService::class);
+
+    $order = $service->create(
+        orderServicePayload($deliveryZone, [
+            [
+                'product_id' => $product->id,
+                'quantity' => 2,
+            ],
+        ]),
+    );
+
+    $confirmedOrder = $service->confirm($order);
+    $preparingOrder = $service->markPreparing($confirmedOrder);
+    $shippedOrder = $service->markShipped($preparingOrder);
+    $deliveredOrder = $service->markDelivered($shippedOrder);
+
+    expect($deliveredOrder->status)->toBe(Order::STATUS_DELIVERED)
+        ->and($preparingOrder->preparing_at)->not->toBeNull()
+        ->and($shippedOrder->shipped_at)->not->toBeNull()
+        ->and($deliveredOrder->delivered_at)->not->toBeNull();
+});
+
+it('records the admin who confirmed or cancelled an order', function () {
+    $deliveryZone = DeliveryZone::factory()->create([
+        'is_active' => true,
+    ]);
+
+    $product = Product::factory()->create([
+        'stock_quantity' => 5,
+        'is_active' => true,
+    ]);
+
+    $admin = User::factory()->create([
+        'is_admin' => true,
+    ]);
+
+    $service = app(OrderService::class);
+
+    $confirmedOrder = $service->create(
+        orderServicePayload($deliveryZone, [
+            [
+                'product_id' => $product->id,
+                'quantity' => 2,
+            ],
+        ]),
+    );
+
+    $service->confirm($confirmedOrder, $admin);
+
+    expect($confirmedOrder->fresh()->confirmed_by)->toBe($admin->id)
+        ->and($confirmedOrder->fresh()->confirmer->is($admin))->toBeTrue();
+
+    $cancelledOrder = $service->create(
+        orderServicePayload($deliveryZone, [
+            [
+                'product_id' => $product->id,
+                'quantity' => 1,
+            ],
+        ]),
+    );
+
+    $service->cancel($cancelledOrder, $admin);
+
+    expect($cancelledOrder->fresh()->cancelled_by)->toBe($admin->id)
+        ->and($cancelledOrder->fresh()->canceller->is($admin))->toBeTrue();
+});
+
+it('assigns carrier and tracking information for an order', function () {
+    $deliveryZone = DeliveryZone::factory()->create([
+        'is_active' => true,
+    ]);
+
+    $product = Product::factory()->create([
+        'stock_quantity' => 5,
+        'is_active' => true,
+    ]);
+
+    $service = app(OrderService::class);
+
+    $order = $service->create(
+        orderServicePayload($deliveryZone, [
+            [
+                'product_id' => $product->id,
+                'quantity' => 1,
+            ],
+        ]),
+    );
+
+    $updatedOrder = $service->assignCarrierAndTracking(
+        $order,
+        'MRW',
+        'TRK-12345',
+    );
+
+    expect($updatedOrder->carrier_name)->toBe('MRW')
+        ->and($updatedOrder->tracking_number)->toBe('TRK-12345');
+});
+
 it('does not confirm an order in a non-pending status', function () {
     $deliveryZone = DeliveryZone::factory()->create([
         'is_active' => true,

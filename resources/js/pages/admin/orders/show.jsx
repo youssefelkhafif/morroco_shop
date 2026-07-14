@@ -16,6 +16,9 @@ const formatStatus = (status) =>
 export default function ShowOrder({ order }) {
     const isPending =
         order.status === 'pending_whatsapp_confirmation';
+    const isConfirmed = order.status === 'confirmed';
+    const isPreparing = order.status === 'preparing';
+    const isShipped = order.status === 'shipped';
 
     function confirmOrder() {
         const confirmed = window.confirm(
@@ -29,6 +32,69 @@ export default function ShowOrder({ order }) {
         router.post(
             `/admin/orders/${order.id}/confirm`,
             {},
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function cancelOrder() {
+        const confirmed = window.confirm(
+            'Cancel this order? This will stop the pending WhatsApp flow.',
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        router.post(
+            `/admin/orders/${order.id}/cancel`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function markPreparing() {
+        router.post(
+            `/admin/orders/${order.id}/prepare`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function markShipped() {
+        router.post(
+            `/admin/orders/${order.id}/ship`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function markDelivered() {
+        router.post(
+            `/admin/orders/${order.id}/deliver`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function submitCarrierTracking(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+        const payload = Object.fromEntries(formData.entries());
+
+        router.post(
+            `/admin/orders/${order.id}/carrier-tracking`,
+            payload,
             {
                 preserveScroll: true,
             },
@@ -75,12 +141,52 @@ export default function ShowOrder({ order }) {
                             </a>
 
                             {isPending && (
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={confirmOrder}
+                                        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+                                    >
+                                        Confirm order
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={cancelOrder}
+                                        className="rounded-lg border border-destructive/40 bg-background px-4 py-2 text-sm font-semibold text-destructive transition hover:bg-destructive/10"
+                                    >
+                                        Cancel order
+                                    </button>
+                                </>
+                            )}
+
+                            {isConfirmed && (
                                 <button
                                     type="button"
-                                    onClick={confirmOrder}
-                                    className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+                                    onClick={markPreparing}
+                                    className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
                                 >
-                                    Confirm order
+                                    Mark preparing
+                                </button>
+                            )}
+
+                            {isPreparing && (
+                                <button
+                                    type="button"
+                                    onClick={markShipped}
+                                    className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                                >
+                                    Mark shipped
+                                </button>
+                            )}
+
+                            {isShipped && (
+                                <button
+                                    type="button"
+                                    onClick={markDelivered}
+                                    className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                                >
+                                    Mark delivered
                                 </button>
                             )}
                         </div>
@@ -213,6 +319,48 @@ export default function ShowOrder({ order }) {
                         </section>
 
                         <aside className="space-y-6">
+                            <section className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+                                <h2 className="text-lg font-semibold">
+                                    Shipping details
+                                </h2>
+
+                                <form
+                                    className="mt-5 space-y-3"
+                                    onSubmit={submitCarrierTracking}
+                                >
+                                    <div>
+                                        <label className="text-sm font-medium text-muted-foreground">
+                                            Carrier
+                                        </label>
+                                        <input
+                                            name="carrier_name"
+                                            defaultValue={order.carrier_name ?? ''}
+                                            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                                            placeholder="Aramex"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-sm font-medium text-muted-foreground">
+                                            Tracking number
+                                        </label>
+                                        <input
+                                            name="tracking_number"
+                                            defaultValue={order.tracking_number ?? ''}
+                                            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                                            placeholder="TRK-123456"
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-semibold transition hover:bg-muted"
+                                    >
+                                        Save tracking
+                                    </button>
+                                </form>
+                            </section>
+
                             <section className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
                                 <h2 className="text-lg font-semibold">
                                     Cash on delivery
