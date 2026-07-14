@@ -120,9 +120,9 @@ class OrderService
         });
     }
 
-    public function confirm(Order $order): Order
+    public function confirm(Order $order, ?User $admin = null): Order
     {
-        return DB::transaction(function () use ($order) {
+        return DB::transaction(function () use ($order, $admin) {
             $order = Order::query()
                 ->with('items')
                 ->lockForUpdate()
@@ -187,7 +187,144 @@ class OrderService
             $order->forceFill([
                 'status' => Order::STATUS_CONFIRMED,
                 'confirmed_at' => now(),
+                'confirmed_by' => $admin?->id,
                 'stock_deducted_at' => now(),
+            ])->save();
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function cancel(Order $order, ?User $admin = null): Order
+    {
+        return DB::transaction(function () use ($order, $admin) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            if ($order->hasStockBeenDeducted()) {
+                return $order->fresh([
+                    'items',
+                    'deliveryZone',
+                    'customer',
+                ]);
+            }
+
+            if ($order->status !== Order::STATUS_PENDING_WHATSAPP_CONFIRMATION) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only pending WhatsApp orders can be cancelled.',
+                ]);
+            }
+
+            $order->forceFill([
+                'status' => Order::STATUS_CANCELLED,
+                'cancelled_at' => now(),
+                'cancelled_by' => $admin?->id,
+            ])->save();
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function markPreparing(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            if ($order->status !== Order::STATUS_CONFIRMED) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only confirmed orders can be marked as preparing.',
+                ]);
+            }
+
+            $order->forceFill([
+                'status' => Order::STATUS_PREPARING,
+                'preparing_at' => now(),
+            ])->save();
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function markShipped(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            if ($order->status !== Order::STATUS_PREPARING) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only preparing orders can be marked as shipped.',
+                ]);
+            }
+
+            $order->forceFill([
+                'status' => Order::STATUS_SHIPPED,
+                'shipped_at' => now(),
+            ])->save();
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function markDelivered(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            if ($order->status !== Order::STATUS_SHIPPED) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only shipped orders can be marked as delivered.',
+                ]);
+            }
+
+            $order->forceFill([
+                'status' => Order::STATUS_DELIVERED,
+                'delivered_at' => now(),
+            ])->save();
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function assignCarrierAndTracking(
+        Order $order,
+        string $carrierName,
+        string $trackingNumber,
+    ): Order {
+        return DB::transaction(function () use ($order, $carrierName, $trackingNumber) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            $order->forceFill([
+                'carrier_name' => trim($carrierName),
+                'tracking_number' => trim($trackingNumber),
             ])->save();
 
             return $order->fresh([

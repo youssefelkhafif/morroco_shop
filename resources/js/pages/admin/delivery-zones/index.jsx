@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import AdminSidebar from '@/components/admin/admin-sidebar';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -28,9 +29,11 @@ export default function DeliveryZonesIndex({ deliveryZones }) {
         <>
             <Head title="Delivery zones" />
 
-            <main className="min-h-screen bg-background p-6 text-foreground">
-                <div className="mx-auto max-w-6xl">
-                    <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+            <div className="min-h-screen bg-background text-foreground">
+                <div className="flex min-h-screen flex-col lg:flex-row">
+                    <main className="flex-1 p-6">
+                        <div className="mx-auto max-w-6xl">
+                            <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <Link
                                 href="/admin"
@@ -177,8 +180,12 @@ export default function DeliveryZonesIndex({ deliveryZones }) {
                             </div>
                         )}
                     </section>
+                        </div>
+                    </main>
+
+                    <AdminSidebar currentPath="/admin/delivery-zones" />
                 </div>
-            </main>
+            </div>
         </>
     );
 }

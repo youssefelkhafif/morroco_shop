@@ -1,5 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import AdminSidebar from '@/components/admin/admin-sidebar';
 
 export default function CategoriesIndex({ categories }) {
     const { errors } = usePage().props;
@@ -29,9 +30,11 @@ export default function CategoriesIndex({ categories }) {
         <>
             <Head title="Categories" />
 
-            <main className="min-h-screen bg-background p-6 text-foreground">
-                <div className="mx-auto max-w-6xl">
-                    <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="min-h-screen bg-background text-foreground">
+                <div className="flex min-h-screen flex-col lg:flex-row">
+                    <main className="flex-1 p-6">
+                        <div className="mx-auto max-w-6xl">
+                            <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
                         <div>
                             <p className="text-sm font-medium text-muted-foreground">
                                 Morocco Shop / Admin
@@ -174,38 +177,42 @@ export default function CategoriesIndex({ categories }) {
                         )}
                     </section>
 
-                    {(categories.prev_page_url || categories.next_page_url) && (
-                        <div className="mt-6 flex items-center justify-between">
-                            {categories.prev_page_url ? (
-                                <Link
-                                    href={categories.prev_page_url}
-                                    className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
-                                >
-                                    Previous
-                                </Link>
-                            ) : (
-                                <span />
-                            )}
+                        {(categories.prev_page_url || categories.next_page_url) && (
+                            <div className="mt-6 flex items-center justify-between">
+                                {categories.prev_page_url ? (
+                                    <Link
+                                        href={categories.prev_page_url}
+                                        className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
+                                    >
+                                        Previous
+                                    </Link>
+                                ) : (
+                                    <span />
+                                )}
 
-                            <span className="text-sm text-muted-foreground">
-                                Page {categories.current_page} of{' '}
-                                {categories.last_page}
-                            </span>
+                                <span className="text-sm text-muted-foreground">
+                                    Page {categories.current_page} of{' '}
+                                    {categories.last_page}
+                                </span>
 
-                            {categories.next_page_url ? (
-                                <Link
-                                    href={categories.next_page_url}
-                                    className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
-                                >
-                                    Next
-                                </Link>
-                            ) : (
-                                <span />
-                            )}
+                                {categories.next_page_url ? (
+                                    <Link
+                                        href={categories.next_page_url}
+                                        className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
+                                    >
+                                        Next
+                                    </Link>
+                                ) : (
+                                    <span />
+                                )}
+                            </div>
+                        )}
                         </div>
-                    )}
+                    </main>
+
+                    <AdminSidebar currentPath="/admin/categories" />
                 </div>
-            </main>
+            </div>
         </>
     );
 }
