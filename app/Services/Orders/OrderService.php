@@ -6,6 +6,7 @@ use App\Models\DeliveryZone;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Notifications\OrderConfirmedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -190,6 +191,8 @@ class OrderService
                 'confirmed_by' => $admin?->id,
                 'stock_deducted_at' => now(),
             ])->save();
+
+            $order->customer?->notify(new OrderConfirmedNotification($order));
 
             return $order->fresh([
                 'items',
