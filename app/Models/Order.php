@@ -45,9 +45,12 @@ class Order extends Model
         'carrier_name',
         'tracking_number',
         'confirmed_at',
+        'confirmed_by',
+        'preparing_at',
         'shipped_at',
         'delivered_at',
         'cancelled_at',
+        'cancelled_by',
         'no_answer_at',
         'refused_at_delivery_at',
         'returned_at',
@@ -62,6 +65,7 @@ class Order extends Model
             'cod_amount_mad' => 'decimal:2',
             'stock_deducted_at' => 'datetime',
             'confirmed_at' => 'datetime',
+            'preparing_at' => 'datetime',
             'shipped_at' => 'datetime',
             'delivered_at' => 'datetime',
             'cancelled_at' => 'datetime',
@@ -84,6 +88,16 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function confirmer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    public function canceller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 
     public function hasStockBeenDeducted(): bool

@@ -7,6 +7,7 @@ use App\Http\Requests\Shop\StoreCheckoutRequest;
 use App\Models\DeliveryZone;
 use App\Models\Order;
 use App\Services\Orders\OrderService;
+use App\Services\Orders\WhatsAppNotificationService;
 use App\Services\Shop\CartService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -54,6 +55,7 @@ class CheckoutController extends Controller
         StoreCheckoutRequest $request,
         CartService $cartService,
         OrderService $orderService,
+        WhatsAppNotificationService $whatsAppNotificationService,
     ) {
         $cartItems = $cartService->orderItems();
 
@@ -62,9 +64,7 @@ class CheckoutController extends Controller
                 ->with('error', 'Your cart is empty.');
         }
 
-        $whatsAppNumber = $this->configuredWhatsAppNumber();
-
-        if (! $whatsAppNumber) {
+        if (! $whatsAppNotificationService->configuredWhatsAppNumber()) {
             return back()->withErrors([
                 'checkout' => 'WhatsApp confirmation is not configured yet.',
             ]);
@@ -81,48 +81,7 @@ class CheckoutController extends Controller
         $cartService->clear();
 
         return Inertia::location(
-            $this->whatsAppConfirmationUrl($order, $whatsAppNumber),
+            $whatsAppNotificationService->confirmationUrl($order),
         );
-    }
-
-    private function configuredWhatsAppNumber(): ?string
-    {
-        $number = preg_replace(
-            '/\D+/',
-            '',
-            (string) config('shop.whatsapp.number'),
-        );
-
-        return $number === '' ? null : $number;
-    }
-
-    private function whatsAppConfirmationUrl(
-        Order $order,
-        string $whatsAppNumber,
-    ): string {
-        $items = $order->items
-            ->map(
-                fn ($item) => "- {$item->product_name} × {$item->quantity} — MAD {$item->line_total_mad}",
-            )
-            ->implode("\n");
-
-        $message = implode("\n", [
-            'Hello Morocco Shop,',
-            '',
-            "I want to confirm order {$order->order_number}.",
-            '',
-            "Customer: {$order->customer_name}",
-            "Phone: {$order->customer_phone}",
-            "Delivery: {$order->delivery_city} · {$order->delivery_district} · {$order->delivery_zone_name}",
-            "Address: {$order->delivery_address}",
-            '',
-            'Products:',
-            $items,
-            '',
-            "COD total: MAD {$order->cod_amount_mad}",
-        ]);
-
-        return "https://wa.me/{$whatsAppNumber}?text="
-            . rawurlencode($message);
     }
 }
