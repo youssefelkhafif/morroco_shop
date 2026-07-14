@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useMemo } from 'react';
+import NotificationBell from '@/components/notification-bell';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -46,22 +47,28 @@ export default function CheckoutIndex({
 
             <main className="min-h-screen bg-background p-6 text-foreground">
                 <div className="mx-auto max-w-6xl">
-                    <div className="mb-8">
-                        <Link
-                            href="/cart"
-                            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-                        >
-                            ← Back to cart
-                        </Link>
+                    <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <Link
+                                href="/cart"
+                                className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                            >
+                                ← Back to cart
+                            </Link>
 
-                        <h1 className="mt-3 text-3xl font-bold">
-                            Checkout
-                        </h1>
+                            <h1 className="mt-3 text-3xl font-bold">
+                                Checkout
+                            </h1>
 
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Pay cash on delivery. Your order will be saved first,
-                            then WhatsApp opens for confirmation.
-                        </p>
+                            <p className="mt-2 text-sm text-muted-foreground">
+                                Pay cash on delivery. Your order will be saved first,
+                                then WhatsApp opens for confirmation.
+                            </p>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            {customer?.id && <NotificationBell />}
+                        </div>
                     </div>
 
                     {form.errors.checkout && (

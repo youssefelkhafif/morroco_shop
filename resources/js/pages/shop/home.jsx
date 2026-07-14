@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
+import NotificationBell from '@/components/notification-bell';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -60,12 +61,16 @@ export default function ShopHome({
                             </Link>
 
                             {auth?.user ? (
-                                <Link
-                                    href="/dashboard"
-                                    className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
-                                >
-                                    My Account
-                                </Link>
+                                <>
+                                    <Link
+                                        href="/dashboard"
+                                        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                                    >
+                                        My Account
+                                    </Link>
+
+                                    <NotificationBell />
+                                </>
                             ) : (
                                 <>
                                     <Link
