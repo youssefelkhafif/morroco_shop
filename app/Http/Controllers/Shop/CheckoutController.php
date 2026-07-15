@@ -44,10 +44,6 @@ class CheckoutController extends Controller
         return Inertia::render('shop/checkout/index', [
             'cart' => $cart,
             'delivery_zones' => $deliveryZones,
-            'customer' => [
-                'name' => request()->user()?->name,
-                'email' => request()->user()?->email,
-            ],
         ]);
     }
 

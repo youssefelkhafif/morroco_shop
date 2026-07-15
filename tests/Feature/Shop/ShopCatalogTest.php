@@ -29,6 +29,9 @@ it('shows active products and the current session cart count on the shop home pa
         ->assertInertia(fn (Assert $page) => $page
             ->component('shop/home')
             ->where('cart_item_count', 2)
+            ->where('hero_badge', 'CASH ON DELIVERY · MOROCCO')
+            ->where('hero_title', 'Streetwear caps, refined for everyday wear.')
+            ->where('hero_subtitle', 'Minimal silhouettes, premium finishing, and a sharp fit from first impression to final delivery.')
             ->has('products.data', 1)
             ->where('products.data.0.id', $activeProduct->id)
             ->where('products.data.0.name', 'Wireless Headphones')

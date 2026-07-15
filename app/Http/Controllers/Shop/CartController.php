@@ -26,11 +26,16 @@ class CartController extends Controller
         $data = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
             'quantity' => ['required', 'integer', 'min:1', 'max:1000'],
+            'color_id' => ['nullable', 'integer', 'exists:product_colors,id'],
         ]);
 
         $product = Product::query()->findOrFail($data['product_id']);
 
-        $cartService->add($product, (int) $data['quantity']);
+        $cartService->add(
+            $product,
+            (int) $data['quantity'],
+            $data['color_id'] ?? null,
+        );
 
         return to_route('cart.index')
             ->with('success', 'Product added to cart.');

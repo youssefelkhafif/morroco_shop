@@ -13,10 +13,15 @@ export default function ShopHome({
     auth,
     products,
     cart_item_count: cartItemCount,
+    hero_badge,
+    hero_title,
+    hero_subtitle,
 }) {
     const [addingProductId, setAddingProductId] = useState(null);
 
     const productRows = products?.data ?? [];
+    const featuredProduct =
+        productRows.find((product) => product.is_featured) ?? productRows[0] ?? null;
 
     function addToCart(product) {
         setAddingProductId(product.id);
@@ -38,23 +43,23 @@ export default function ShopHome({
 
     return (
         <>
-            <Head title="Morocco Shop" />
+            <Head title="Morocco Shop | Streetwear Caps" />
 
-            <main className="min-h-screen bg-slate-50 text-slate-900">
-                <header className="border-b bg-white">
-                    <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-5">
-                        <Link href="/" className="text-xl font-black">
+            <main className="min-h-screen bg-[#f7f7f3] text-[#111111]">
+                <header className="sticky top-0 z-20 border-b border-black/10 bg-white/90 backdrop-blur">
+                    <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+                        <Link href="/" className="text-lg font-black uppercase tracking-[0.24em]">
                             Morocco Shop
                         </Link>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             <Link
                                 href="/cart"
-                                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+                                className="rounded-full border border-black/10 px-3 py-2 text-sm font-semibold text-black transition hover:bg-black hover:text-white sm:px-4"
                             >
                                 Cart
                                 {cartItemCount > 0 && (
-                                    <span className="ml-2 rounded-full bg-slate-900 px-2 py-0.5 text-xs text-white">
+                                    <span className="ml-2 rounded-full bg-black px-2 py-0.5 text-[11px] text-white">
                                         {cartItemCount}
                                     </span>
                                 )}
@@ -64,7 +69,7 @@ export default function ShopHome({
                                 <>
                                     <Link
                                         href="/dashboard"
-                                        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                                        className="rounded-full bg-black px-3 py-2 text-sm font-semibold text-white sm:px-4"
                                     >
                                         My Account
                                     </Link>
@@ -75,14 +80,14 @@ export default function ShopHome({
                                 <>
                                     <Link
                                         href="/login"
-                                        className="text-sm font-semibold text-slate-700"
+                                        className="hidden text-sm font-semibold text-black/70 sm:inline-flex"
                                     >
                                         Log in
                                     </Link>
 
                                     <Link
                                         href="/register"
-                                        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                                        className="rounded-full bg-black px-3 py-2 text-sm font-semibold text-white sm:px-4"
                                     >
                                         Create account
                                     </Link>
@@ -92,116 +97,175 @@ export default function ShopHome({
                     </div>
                 </header>
 
-                <section className="border-b bg-white">
-                    <div className="mx-auto max-w-6xl px-6 py-20">
-                        <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-emerald-600">
-                            Cash on Delivery · Morocco
-                        </p>
+                <section className="border-b border-black/10 bg-white">
+                    <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
+                        <div className="flex flex-col justify-center">
+                            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] text-black/60">
+                                {hero_badge}
+                            </p>
 
-                        <h1 className="max-w-3xl text-5xl font-black leading-tight">
-                            Order online. Confirm on WhatsApp. Pay at delivery.
-                        </h1>
+                            <h1 className="max-w-3xl text-4xl font-black leading-[0.95] sm:text-5xl lg:text-6xl">
+                                {hero_title}
+                            </h1>
 
-                        <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-                            Browse products, place your order without an
-                            account, then confirm it on WhatsApp.
-                        </p>
+                            <p className="mt-6 max-w-2xl text-base leading-8 text-black/70 sm:text-lg">
+                                {hero_subtitle}
+                            </p>
+
+                            <div className="mt-8 flex flex-wrap gap-3">
+                                <Link
+                                    href="#collection"
+                                    className="rounded-full bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-black/90"
+                                >
+                                    Shop now
+                                </Link>
+                                <Link
+                                    href="/cart"
+                                    className="rounded-full border border-black/10 px-6 py-3 text-sm font-semibold text-black transition hover:bg-black/5"
+                                >
+                                    View cart
+                                </Link>
+                            </div>
+                        </div>
+
+                        <div className="rounded-[2rem] border border-black/10 bg-[#f2efe7] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.08)]">
+                            <div className="rounded-[1.5rem] border border-black/10 bg-white p-4 sm:p-5">
+                                <div className="mb-4 flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.3em] text-black/50">
+                                    <span>Featured drop</span>
+                                    <span>Limited release</span>
+                                </div>
+
+                                {featuredProduct ? (
+                                    <>
+                                        <div className="overflow-hidden rounded-[1.25rem] bg-[#f7f6f1]">
+                                            {featuredProduct.image_url ? (
+                                                <img
+                                                    src={featuredProduct.image_url}
+                                                    alt={featuredProduct.name}
+                                                    className="aspect-[4/5] w-full object-cover transition duration-500 hover:scale-105"
+                                                />
+                                            ) : (
+                                                <div className="flex aspect-[4/5] items-center justify-center text-sm text-black/50">
+                                                    No product image
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="mt-4 flex items-end justify-between gap-3">
+                                            <div>
+                                                <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-black/50">
+                                                    New arrival
+                                                </p>
+                                                <h2 className="mt-1 text-xl font-black">
+                                                    {featuredProduct.name}
+                                                </h2>
+                                            </div>
+
+                                            <p className="text-xl font-black">
+                                                {formatMad(featuredProduct.price_mad)}
+                                            </p>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="flex aspect-[4/5] items-center justify-center rounded-[1.25rem] border border-dashed border-black/10 bg-[#faf8f2] text-sm text-black/60">
+                                        New pieces will appear here soon.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </section>
 
-                <section className="mx-auto max-w-6xl px-6 py-14">
-                    <div className="mb-8">
-                        <h2 className="text-3xl font-black">
-                            Available products
-                        </h2>
+                <section id="collection" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                    <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-black/50">
+                                Collection
+                            </p>
+                            <h2 className="text-3xl font-black sm:text-4xl">
+                                Curated streetwear caps
+                            </h2>
+                        </div>
 
-                        <p className="mt-2 text-sm text-slate-600">
-                            Prices and stock are verified by Morocco Shop before
-                            checkout.
+                        <p className="max-w-2xl text-sm leading-7 text-black/65">
+                            Clean silhouettes, premium finishing, and a sharp fit for everyday wear.
                         </p>
                     </div>
 
                     {productRows.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
+                        <div className="rounded-[1.5rem] border border-dashed border-black/10 bg-white p-10 text-center">
                             <h3 className="text-lg font-bold">
                                 No products available yet
                             </h3>
 
-                            <p className="mt-2 text-sm text-slate-600">
+                            <p className="mt-2 text-sm text-black/60">
                                 The shop owner will add products soon.
                             </p>
                         </div>
                     ) : (
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                             {productRows.map((product) => {
-                                const isOutOfStock =
-                                    product.stock_quantity < 1;
-
-                                const isAdding =
-                                    addingProductId === product.id;
+                                const isOutOfStock = product.stock_quantity < 1;
+                                const isAdding = addingProductId === product.id;
 
                                 return (
                                     <article
                                         key={product.id}
-                                        className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+                                        className="group overflow-hidden rounded-[1.5rem] border border-black/10 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
                                     >
-                                        <div className="flex aspect-square items-center justify-center bg-slate-100">
+                                        <Link href={`/products/${product.id}`} className="overflow-hidden rounded-[1.1rem] bg-[#f7f6f1] transition duration-300 hover:opacity-90">
                                             {product.image_url ? (
                                                 <img
                                                     src={product.image_url}
                                                     alt={product.name}
-                                                    className="h-full w-full object-cover"
+                                                    className="aspect-[3/4] w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                                                 />
                                             ) : (
-                                                <span className="text-sm text-slate-500">
+                                                <div className="flex aspect-[3/4] items-center justify-center text-sm text-black/50">
                                                     No product image
-                                                </span>
+                                                </div>
                                             )}
-                                        </div>
+                                        </Link>
 
-                                        <div className="p-5">
+                                        <div className="px-1 pb-1 pt-4">
                                             <div className="flex flex-wrap items-center gap-2">
                                                 {product.category_name && (
-                                                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                                                    <span className="rounded-full bg-black/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-black/60">
                                                         {product.category_name}
                                                     </span>
                                                 )}
 
                                                 {product.is_featured && (
-                                                    <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                                                    <span className="rounded-full bg-black px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white">
                                                         Featured
                                                     </span>
                                                 )}
                                             </div>
 
-                                            <h3 className="mt-3 text-lg font-bold">
+                                            <Link href={`/products/${product.id}`} className="mt-3 block text-lg font-black uppercase tracking-[0.03em] transition hover:text-black/70">
                                                 {product.name}
-                                            </h3>
+                                            </Link>
 
                                             {product.description && (
-                                                <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">
+                                                <p className="mt-2 line-clamp-2 text-sm leading-6 text-black/60">
                                                     {product.description}
                                                 </p>
                                             )}
 
-                                            <div className="mt-5 flex items-end justify-between gap-3">
+                                            <div className="mt-4 flex items-end justify-between gap-3">
                                                 <div>
                                                     {product.old_price_mad && (
-                                                        <p className="text-sm text-slate-400 line-through">
-                                                            {formatMad(
-                                                                product.old_price_mad,
-                                                            )}
+                                                        <p className="text-sm text-black/35 line-through">
+                                                            {formatMad(product.old_price_mad)}
                                                         </p>
                                                     )}
 
-                                                    <p className="text-xl font-black">
-                                                        {formatMad(
-                                                            product.price_mad,
-                                                        )}
+                                                    <p className="text-lg font-black">
+                                                        {formatMad(product.price_mad)}
                                                     </p>
                                                 </div>
 
-                                                <p className="text-xs text-slate-500">
+                                                <p className="text-xs text-black/50">
                                                     {isOutOfStock
                                                         ? 'Out of stock'
                                                         : `${product.stock_quantity} available`}
@@ -211,10 +275,8 @@ export default function ShopHome({
                                             <button
                                                 type="button"
                                                 disabled={isOutOfStock || isAdding}
-                                                onClick={() =>
-                                                    addToCart(product)
-                                                }
-                                                className="mt-5 w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                                                onClick={() => addToCart(product)}
+                                                className="mt-5 w-full rounded-full bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black/90 disabled:cursor-not-allowed disabled:bg-black/25"
                                             >
                                                 {isAdding
                                                     ? 'Adding...'

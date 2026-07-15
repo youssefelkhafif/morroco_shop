@@ -20,6 +20,12 @@ export default function ProductForm({ product = null, categories = [] }) {
         stock_quantity: product?.stock_quantity?.toString() ?? '0',
         is_active: product?.is_active ?? true,
         is_featured: product?.is_featured ?? false,
+        colors: product?.colors?.map((color) => ({
+            id: color.id,
+            name: color.name,
+            hex_code: color.hex_code || '#000000',
+            sort_order: color.sort_order ?? 0,
+        })) ?? [],
     });
 
     function handleNameChange(value) {
@@ -42,6 +48,31 @@ export default function ProductForm({ product = null, categories = [] }) {
         }
 
         post('/admin/products');
+    }
+
+    function updateColor(index, field, value) {
+        const updatedColors = [...data.colors];
+        updatedColors[index] = {
+            ...updatedColors[index],
+            [field]: value,
+        };
+
+        setData('colors', updatedColors);
+    }
+
+    function addColor() {
+        setData('colors', [
+            ...data.colors,
+            {
+                name: '',
+                hex_code: '#000000',
+                sort_order: data.colors.length,
+            },
+        ]);
+    }
+
+    function removeColor(index) {
+        setData('colors', data.colors.filter((_, i) => i !== index));
     }
 
     return (
@@ -238,6 +269,136 @@ export default function ProductForm({ product = null, categories = [] }) {
                     {errors.stock_quantity && (
                         <p className="mt-2 text-sm text-destructive">
                             {errors.stock_quantity}
+                        </p>
+                    )}
+                </div>
+
+                <div className="md:col-span-2">
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <label className="block text-sm font-medium">
+                                Colors
+                            </label>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                                Add product color variants for the storefront.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={addColor}
+                            className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-black transition hover:bg-black/5"
+                        >
+                            Add color
+                        </button>
+                    </div>
+
+                    {data.colors.length === 0 ? (
+                        <div className="mt-4 rounded-lg border border-dashed border-border bg-muted/20 p-4 text-sm text-muted-foreground">
+                            No colors added yet.
+                        </div>
+                    ) : (
+                        <div className="mt-4 space-y-4">
+                            {data.colors.map((color, index) => {
+                                const nameError = errors[`colors.${index}.name`];
+                                const hexError = errors[`colors.${index}.hex_code`];
+
+                                return (
+                                    <div
+                                        key={color.id ?? index}
+                                        className="grid gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-[1.3fr_0.9fr_auto]"
+                                    >
+                                        <div>
+                                            <label
+                                                htmlFor={`colors.${index}.name`}
+                                                className="block text-sm font-medium"
+                                            >
+                                                Color name
+                                            </label>
+
+                                            <input
+                                                id={`colors.${index}.name`}
+                                                type="text"
+                                                value={color.name}
+                                                onChange={(event) =>
+                                                    updateColor(
+                                                        index,
+                                                        'name',
+                                                        event.target.value,
+                                                    )
+                                                }
+                                                className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none ring-ring focus:ring-2"
+                                                placeholder="Black"
+                                            />
+
+                                            {nameError && (
+                                                <p className="mt-2 text-sm text-destructive">
+                                                    {nameError}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <label
+                                                htmlFor={`colors.${index}.hex_code`}
+                                                className="block text-sm font-medium"
+                                            >
+                                                Color code
+                                            </label>
+
+                                            <div className="mt-2 flex items-center gap-3">
+                                                <input
+                                                    id={`colors.${index}.hex_code`}
+                                                    type="color"
+                                                    value={color.hex_code}
+                                                    onChange={(event) =>
+                                                        updateColor(
+                                                            index,
+                                                            'hex_code',
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    className="h-12 w-12 rounded-lg border border-input bg-background p-0"
+                                                />
+
+                                                <input
+                                                    type="text"
+                                                    value={color.hex_code}
+                                                    onChange={(event) =>
+                                                        updateColor(
+                                                            index,
+                                                            'hex_code',
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none ring-ring focus:ring-2"
+                                                    placeholder="#000000"
+                                                />
+                                            </div>
+
+                                            {hexError && (
+                                                <p className="mt-2 text-sm text-destructive">
+                                                    {hexError}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => removeColor(index)}
+                                            className="self-end rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm font-semibold text-destructive transition hover:bg-destructive/20"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {errors.colors && (
+                        <p className="mt-3 text-sm text-destructive">
+                            {errors.colors}
                         </p>
                     )}
                 </div>

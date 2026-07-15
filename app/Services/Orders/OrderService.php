@@ -70,6 +70,8 @@ class OrderService
                     'product_id' => $product->id,
                     'product_name' => $product->name,
                     'product_slug' => $product->slug,
+                    'product_color_id' => $item['color_id'] ?? null,
+                    'product_color_name' => $item['color_name'] ?? null,
                     'unit_price_mad' => $this->centsToMoney($unitPriceCents),
                     'quantity' => $item['quantity'],
                     'line_total_mad' => $this->centsToMoney($lineTotalCents),
@@ -346,7 +348,7 @@ class OrderService
             ]);
         }
 
-        $quantities = [];
+        $normalized = [];
 
         foreach (array_values($items) as $index => $item) {
             $productId = filter_var(
@@ -361,25 +363,33 @@ class OrderService
                 ['options' => ['min_range' => 1]],
             );
 
+            $colorId = isset($item['color_id'])
+                ? filter_var(
+                    $item['color_id'],
+                    FILTER_VALIDATE_INT,
+                    ['options' => ['min_range' => 1]],
+                )
+                : null;
+
+            $colorName = isset($item['color_name'])
+                ? trim((string) $item['color_name'])
+                : null;
+
             if ($productId === false || $quantity === false) {
                 throw ValidationException::withMessages([
                     "items.{$index}" => 'Each item needs a valid product and quantity.',
                 ]);
             }
 
-            $quantities[$productId] = ($quantities[$productId] ?? 0)
-                + $quantity;
+            $normalized[$productId] = [
+                'product_id' => $productId,
+                'quantity' => $quantity,
+                'color_id' => $colorId,
+                'color_name' => $colorName,
+            ];
         }
 
-        return collect($quantities)
-            ->map(
-                fn (int $quantity, int $productId) => [
-                    'product_id' => $productId,
-                    'quantity' => $quantity,
-                ],
-            )
-            ->values()
-            ->all();
+        return array_values($normalized);
     }
 
     private function generateOrderNumber(): string

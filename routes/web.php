@@ -9,8 +9,11 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\HomeController;
 use App\Http\Controllers\Shop\CheckoutController;
+use App\Http\Controllers\Shop\ProductController as ShopProductController;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/products/{product}', [ShopProductController::class, 'show'])
+    ->name('products.show');
 
 Route::get('/cart', [CartController::class, 'index'])
     ->name('cart.index');

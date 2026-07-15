@@ -42,6 +42,9 @@ class HomeController extends Controller
         return Inertia::render('shop/home', [
             'products' => $products,
             'cart_item_count' => $cartService->summary()['item_count'],
+            'hero_badge' => 'CASH ON DELIVERY · MOROCCO',
+            'hero_title' => 'Streetwear caps, refined for everyday wear.',
+            'hero_subtitle' => 'Minimal silhouettes, premium finishing, and a sharp fit from first impression to final delivery.',
         ]);
     }
 }
