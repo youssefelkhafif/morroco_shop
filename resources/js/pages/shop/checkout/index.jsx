@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
 import NotificationBell from '@/components/notification-bell';
 
@@ -12,12 +12,13 @@ const formatMad = (value) =>
 export default function CheckoutIndex({
     cart,
     delivery_zones: deliveryZones,
-    customer,
 }) {
+    const { auth } = usePage().props;
+
     const form = useForm({
-        customer_name: customer?.name ?? '',
+        customer_name: '',
         customer_phone: '',
-        customer_email: customer?.email ?? '',
+        customer_email: '',
         delivery_zone_id: '',
         delivery_address: '',
         customer_note: '',
@@ -67,7 +68,7 @@ export default function CheckoutIndex({
                         </div>
 
                         <div className="flex items-center gap-3">
-                            {customer?.id && <NotificationBell />}
+                            {auth.user?.id && <NotificationBell />}
                         </div>
                     </div>
 
