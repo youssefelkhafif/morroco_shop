@@ -45,6 +45,12 @@ class Product extends Model
             ->orderBy('sort_order');
     }
 
+    public function colors(): HasMany
+    {
+        return $this->hasMany(ProductColor::class)
+            ->orderBy('sort_order');
+    }
+
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);

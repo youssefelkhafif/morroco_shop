@@ -53,7 +53,11 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request): RedirectResponse
     {
-        Product::create($request->validated());
+        $product = Product::create($request->validated());
+
+        if (! empty($colors = $request->validated()['colors'] ?? [])) {
+            $this->syncProductColors($product, $colors);
+        }
 
         return to_route('admin.products.index')
             ->with('success', 'Product created successfully.');
@@ -61,7 +65,7 @@ class ProductController extends Controller
 
     public function edit(Product $product): Response
     {
-        $product->load('images');
+        $product->load(['images', 'colors']);
 
         return Inertia::render('admin/products/edit', [
             'product' => [
@@ -83,6 +87,15 @@ class ProductController extends Controller
                     ])
                     ->values()
                     ->all(),
+                'colors' => $product->colors
+                    ->map(fn ($color) => [
+                        'id' => $color->id,
+                        'name' => $color->name,
+                        'hex_code' => $color->hex_code,
+                        'sort_order' => $color->sort_order,
+                    ])
+                    ->values()
+                    ->all(),
             ],
             'categories' => $this->categoriesForForm(),
         ]);
@@ -94,8 +107,37 @@ class ProductController extends Controller
     ): RedirectResponse {
         $product->update($request->validated());
 
+        $this->syncProductColors($product, $request->validated()['colors'] ?? []);
+
         return to_route('admin.products.index')
             ->with('success', 'Product updated successfully.');
+    }
+
+    private function syncProductColors(Product $product, array $colors): void
+    {
+        $submittedIds = collect($colors)
+            ->pluck('id')
+            ->filter()
+            ->all();
+
+        $product->colors()
+            ->whereNotIn('id', $submittedIds)
+            ->delete();
+
+        foreach ($colors as $index => $color) {
+            $data = [
+                'name' => $color['name'],
+                'hex_code' => $color['hex_code'],
+                'sort_order' => $color['sort_order'] ?? $index,
+            ];
+
+            if (! empty($color['id'])) {
+                $product->colors()->where('id', $color['id'])->update($data);
+                continue;
+            }
+
+            $product->colors()->create($data);
+        }
     }
 
     public function destroy(

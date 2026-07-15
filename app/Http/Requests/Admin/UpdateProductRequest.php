@@ -75,6 +75,32 @@ class UpdateProductRequest extends FormRequest
                 'required',
                 'boolean',
             ],
+            'colors' => [
+                'nullable',
+                'array',
+            ],
+            'colors.*.id' => [
+                'nullable',
+                'integer',
+                Rule::exists('product_colors', 'id')->where(
+                    fn ($query) => $query->where('product_id', $productId),
+                ),
+            ],
+            'colors.*.name' => [
+                'required',
+                'string',
+                'max:120',
+            ],
+            'colors.*.hex_code' => [
+                'required',
+                'string',
+                'regex:/^#([0-9a-fA-F]{3}){1,2}$/',
+            ],
+            'colors.*.sort_order' => [
+                'nullable',
+                'integer',
+                'min:0',
+            ],
         ];
     }
 }
