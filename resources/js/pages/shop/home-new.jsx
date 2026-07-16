@@ -10,6 +10,21 @@ const formatMad = (value) =>
         minimumFractionDigits: 2,
     }).format(Number(value));
 
+const categories = [
+    { title: 'Caps', description: 'The core edit', accent: 'from-black to-zinc-700' },
+    { title: 'Snapbacks', description: 'Street-ready structure', accent: 'from-zinc-700 to-zinc-500' },
+    { title: 'Trucker', description: 'Layered utility', accent: 'from-stone-700 to-stone-500' },
+    { title: 'Beanies', description: 'Soft essentials', accent: 'from-stone-600 to-stone-400' },
+    { title: 'Limited', description: 'Rare drops', accent: 'from-neutral-800 to-neutral-600' },
+    { title: 'Future', description: 'Built to expand', accent: 'from-zinc-900 to-zinc-700' },
+];
+
+const collections = [
+    { title: 'Summer Drop', subtitle: 'Lightweight silhouettes', badge: 'New edit' },
+    { title: 'Essentials', subtitle: 'Clean daily layers', badge: 'Core range' },
+    { title: 'Limited Release', subtitle: 'Rare editions', badge: 'Exclusive' },
+];
+
 const reasons = [
     { icon: BadgeCheck, title: 'Premium Materials', description: 'Refined textures and long-wear construction.' },
     { icon: PackageCheck, title: 'Cash on Delivery', description: 'Secure ordering with flexible checkout.' },
@@ -20,8 +35,6 @@ const reasons = [
 export default function ShopHome({
     auth,
     products,
-    themes = [],
-    collections = [],
     cart_item_count: cartItemCount,
     hero_badge,
     hero_title,
@@ -137,53 +150,34 @@ export default function ShopHome({
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
-                        {themes.length === 0 ? (
-                            <div className="col-span-full rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center">
-                                <p className="text-sm text-muted-foreground">No themes available. Add themes from the admin panel.</p>
-                            </div>
-                        ) : (
-                            themes.map((theme) => (
-                                <div key={theme.id} className="group overflow-hidden rounded-[1.5rem] border border-border bg-card p-5 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
-                                    <div className={`h-24 rounded-[1rem] overflow-hidden bg-gradient-to-br ${theme.accent}`}>
-                                        {theme.image_url ? (
-                                            <img src={theme.image_url} alt={theme.title} className="h-full w-full object-cover" />
-                                        ) : null}
-                                    </div>
-                                    <div className="mt-4">
-                                        <h3 className="text-lg font-semibold">{theme.title}</h3>
-                                        <p className="mt-2 text-sm leading-6 text-muted-foreground">{theme.description}</p>
-                                    </div>
+                        {categories.map((category) => (
+                            <div key={category.title} className="group overflow-hidden rounded-[1.5rem] border border-border bg-card p-5 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                <div className={`h-24 rounded-[1rem] bg-gradient-to-br ${category.accent}`} />
+                                <div className="mt-4">
+                                    <h3 className="text-lg font-semibold">{category.title}</h3>
+                                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{category.description}</p>
                                 </div>
-                            ))
-                        )}
+                            </div>
+                        ))}
                     </div>
                 </section>
 
                 <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
                     <div className="grid gap-4 lg:grid-cols-3">
-                        {collections.length === 0 ? (
-                            <div className="col-span-full rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center">
-                                <p className="text-sm text-muted-foreground">No collections available. Add collections from the admin panel.</p>
-                            </div>
-                        ) : (
-                            collections.map((collection) => (
-                                <div key={collection.id} className="group relative overflow-hidden rounded-[2rem] border border-border bg-card p-6 transition duration-300 hover:-translate-y-1">
-                                    {collection.image_url && (
-                                        <img src={collection.image_url} alt={collection.title} className="absolute inset-0 h-full w-full object-cover" />
-                                    )}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/20 to-transparent" />
-                                    <div className="relative flex min-h-[320px] flex-col justify-end rounded-[1.4rem] bg-[linear-gradient(135deg,rgba(255,255,255,0.18),rgba(0,0,0,0.35))] p-6">
-                                        <p className="mb-3 w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/90 backdrop-blur">{collection.badge}</p>
-                                        <h3 className="text-2xl font-black text-white">{collection.title}</h3>
-                                        <p className="mt-2 max-w-sm text-sm leading-7 text-white/80">{collection.subtitle}</p>
-                                        <Link href="#collection" className="mt-6 inline-flex w-fit items-center gap-2 text-sm font-semibold text-white">
-                                            View edit
-                                            <ArrowRight className="h-4 w-4" />
-                                        </Link>
-                                    </div>
+                        {collections.map((collection) => (
+                            <div key={collection.title} className="group relative overflow-hidden rounded-[2rem] border border-border bg-card p-6 transition duration-300 hover:-translate-y-1">
+                                <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/20 to-transparent" />
+                                <div className="relative flex min-h-[320px] flex-col justify-end rounded-[1.4rem] bg-[linear-gradient(135deg,rgba(255,255,255,0.18),rgba(0,0,0,0.35))] p-6">
+                                    <p className="mb-3 w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/90 backdrop-blur">{collection.badge}</p>
+                                    <h3 className="text-2xl font-black text-white">{collection.title}</h3>
+                                    <p className="mt-2 max-w-sm text-sm leading-7 text-white/80">{collection.subtitle}</p>
+                                    <Link href="#collection" className="mt-6 inline-flex w-fit items-center gap-2 text-sm font-semibold text-white">
+                                        View edit
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Link>
                                 </div>
-                            ))
-                        )}
+                            </div>
+                        ))}
                     </div>
                 </section>
 
@@ -201,13 +195,13 @@ export default function ShopHome({
                             <p className="mt-2 text-sm text-muted-foreground">The shop owner will add products soon.</p>
                         </div>
                     ) : (
-                        <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory touch-pan-x">
+                        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                             {featuredProducts.map((product) => {
                                 const isOutOfStock = product.stock_quantity < 1;
                                 const isAdding = addingProductId === product.id;
 
                                 return (
-                                    <article key={product.id} className="group min-w-[270px] max-w-[270px] flex-shrink-0 snap-start overflow-hidden rounded-[1.75rem] border border-border bg-card p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:min-w-[290px] sm:max-w-[290px]">
+                                    <article key={product.id} className="group overflow-hidden rounded-[1.75rem] border border-border bg-card p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
                                         <div className="relative overflow-hidden rounded-[1.25rem] bg-muted/80">
                                             {product.image_url ? (
                                                 <img src={product.image_url} alt={product.name} className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.04]" />
@@ -273,9 +267,9 @@ export default function ShopHome({
                         </div>
                     </div>
 
-                    <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory touch-pan-x">
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                         {arrivals.map((product) => (
-                            <div key={product.id} className="group min-w-[270px] max-w-[270px] flex-shrink-0 snap-start overflow-hidden rounded-[1.5rem] border border-border bg-card p-3 transition duration-300 hover:-translate-y-1 sm:min-w-[290px] sm:max-w-[290px]">
+                            <div key={product.id} className="group overflow-hidden rounded-[1.5rem] border border-border bg-card p-3 transition duration-300 hover:-translate-y-1">
                                 <div className="overflow-hidden rounded-[1.15rem] bg-muted/70">
                                     {product.image_url ? (
                                         <img src={product.image_url} alt={product.name} className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.04]" />

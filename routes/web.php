@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\DeliveryZoneController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ThemeController;
+use App\Http\Controllers\Admin\CollectionController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\HomeController;
 use App\Http\Controllers\Shop\CheckoutController;
@@ -62,6 +64,9 @@ Route::middleware(['auth', 'admin'])
 
         Route::resource('delivery-zones', DeliveryZoneController::class)
             ->except('show');
+
+        Route::resource('themes', ThemeController::class)->except('show');
+        Route::resource('collections', CollectionController::class)->except('show');
 
         Route::get('orders', [OrderController::class, 'index'])
             ->name('orders.index');

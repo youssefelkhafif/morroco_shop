@@ -1,36 +1,16 @@
 import { Head, Link } from '@inertiajs/react';
 import { Instagram, MapPin, ShoppingBag } from 'lucide-react';
+import ShopNavigation from '@/components/shop-navigation';
 
-export default function About({ shop_instagram }) {
+export default function About({ auth, shop_instagram }) {
     const instagramHandle = shop_instagram || 'street_wearcap';
 
     return (
         <>
             <Head title="About Us | Street Wear Cap" />
 
-            <main className="min-h-screen bg-[#f7f7f3] text-[#111111]">
-                {/* Header */}
-                <header className="sticky top-0 z-20 border-b border-black/10 bg-white/90 backdrop-blur">
-                    <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-                        <Link href="/" className="text-2xl font-bold tracking-tight">
-                            STREET WEAR CAP
-                        </Link>
-                        <nav className="flex gap-8">
-                            <Link
-                                href="/"
-                                className="hover:text-gray-600 transition"
-                            >
-                                Shop
-                            </Link>
-                            <Link
-                                href="/about"
-                                className="font-semibold"
-                            >
-                                About
-                            </Link>
-                        </nav>
-                    </div>
-                </header>
+            <main className="min-h-screen bg-background text-foreground">
+                <ShopNavigation auth={auth} cartItemCount={0} />
 
                 {/* Hero Section */}
                 <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -51,7 +31,7 @@ export default function About({ shop_instagram }) {
                     <div className="grid gap-12 md:grid-cols-2">
                         <div>
                             <h2 className="text-3xl font-bold mb-4">Our Mission</h2>
-                            <p className="text-gray-600 leading-relaxed space-y-4">
+                            <p className="leading-relaxed space-y-4 text-muted-foreground">
                                 <span className="block">
                                     At Street Wear Cap, we believe in creating premium quality headwear that celebrates Moroccan culture and global streetwear aesthetics. Our mission is to provide high-quality caps and complementary products that resonate with the modern Moroccan lifestyle.
                                 </span>
@@ -60,28 +40,28 @@ export default function About({ shop_instagram }) {
                                 </span>
                             </p>
                         </div>
-                        <div className="bg-white p-8 rounded-lg border border-black/10">
+                        <div className="rounded-lg border border-border bg-card p-8">
                             <h3 className="text-2xl font-bold mb-6">What We Offer</h3>
                             <ul className="space-y-4">
                                 <li className="flex gap-3">
                                     <ShoppingBag className="w-5 h-5 mt-1 flex-shrink-0" />
                                     <div>
                                         <span className="font-semibold">Premium Caps</span>
-                                        <p className="text-sm text-gray-600">High-quality streetwear caps for every style</p>
+                                        <p className="text-sm text-muted-foreground">High-quality streetwear caps for every style</p>
                                     </div>
                                 </li>
                                 <li className="flex gap-3">
                                     <ShoppingBag className="w-5 h-5 mt-1 flex-shrink-0" />
                                     <div>
                                         <span className="font-semibold">Branded Merchandise</span>
-                                        <p className="text-sm text-gray-600">Exclusive cups and accessories</p>
+                                        <p className="text-sm text-muted-foreground">Exclusive cups and accessories</p>
                                     </div>
                                 </li>
                                 <li className="flex gap-3">
                                     <ShoppingBag className="w-5 h-5 mt-1 flex-shrink-0" />
                                     <div>
                                         <span className="font-semibold">Limited Editions</span>
-                                        <p className="text-sm text-gray-600">Unique drops designed for our community</p>
+                                        <p className="text-sm text-muted-foreground">Unique drops designed for our community</p>
                                     </div>
                                 </li>
                             </ul>
@@ -121,14 +101,14 @@ export default function About({ shop_instagram }) {
                 <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 border-t border-black/10">
                     <div className="bg-gradient-to-r from-black to-gray-900 text-white rounded-lg p-12 text-center">
                         <h2 className="text-3xl font-bold mb-6">Connect With Us</h2>
-                        <p className="text-lg mb-8 text-gray-300">
+                        <p className="mb-8 text-lg text-muted-foreground">
                             Join our community and stay updated with the latest drops, events, and exclusive offers.
                         </p>
                         <a
                             href={`https://www.instagram.com/${instagramHandle}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-3 bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+                            className="inline-flex items-center gap-3 rounded-lg bg-background px-8 py-3 font-semibold text-foreground transition hover:bg-muted"
                         >
                             <Instagram className="w-5 h-5" />
                             Follow @{instagramHandle}
@@ -137,18 +117,18 @@ export default function About({ shop_instagram }) {
                 </section>
 
                 {/* Footer */}
-                <footer className="border-t border-black/10 bg-white py-8 mt-16">
+                <footer className="mt-16 border-t border-border bg-card py-8">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <MapPin className="w-4 h-4" />
                                 <span>Casablanca, Morocco</span>
                             </div>
                             <nav className="flex gap-6">
-                                <Link href="/" className="text-sm hover:text-gray-600">
+                                <Link href="/" className="text-sm hover:text-muted-foreground">
                                     Shop
                                 </Link>
-                                <Link href="/about" className="text-sm hover:text-gray-600">
+                                <Link href="/about" className="text-sm hover:text-muted-foreground">
                                     About
                                 </Link>
                             </nav>
