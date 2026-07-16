@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Theme;
+use App\Models\Collection;
 use App\Services\Shop\CartService;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -39,8 +41,18 @@ class HomeController extends Controller
                     : null,
             ]);
 
+        $themes = Theme::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        $collections = Collection::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
         return Inertia::render('shop/home', [
             'products' => $products,
+            'themes' => $themes,
+            'collections' => $collections,
             'cart_item_count' => $cartService->summary()['item_count'],
             'hero_badge' => 'CASH ON DELIVERY · MOROCCO',
             'hero_title' => 'Streetwear caps, refined for everyday wear.',
