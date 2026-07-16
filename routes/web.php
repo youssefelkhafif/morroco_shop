@@ -9,9 +9,15 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\HomeController;
 use App\Http\Controllers\Shop\CheckoutController;
+use App\Http\Controllers\Shop\AccountController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/about', function () {
+    return inertia('shop/about', [
+        'shop_instagram' => config('shop.instagram.handle'),
+    ]);
+})->name('about');
 Route::get('/products/{product}', [ShopProductController::class, 'show'])
     ->name('products.show');
 
@@ -34,7 +40,7 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
     ->name('checkout.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('/dashboard', 'shop/account/index')->name('dashboard');
+    // Account settings handled in settings.php
 });
 
 Route::middleware(['auth', 'admin'])

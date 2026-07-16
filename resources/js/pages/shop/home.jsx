@@ -49,7 +49,7 @@ export default function ShopHome({
                 <header className="sticky top-0 z-20 border-b border-black/10 bg-white/90 backdrop-blur">
                     <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
                         <Link href="/" className="text-lg font-black uppercase tracking-[0.24em]">
-                            Morocco Shop
+                            Streetwear Caps
                         </Link>
 
                         <div className="flex items-center gap-2 sm:gap-3">
@@ -68,10 +68,17 @@ export default function ShopHome({
                             {auth?.user ? (
                                 <>
                                     <Link
-                                        href="/dashboard"
-                                        className="rounded-full bg-black px-3 py-2 text-sm font-semibold text-white sm:px-4"
+                                        href="/notification"
+                                        className="rounded-full border border-black/10 px-3 py-2 text-sm font-semibold text-black transition hover:bg-black hover:text-white sm:px-4"
                                     >
-                                        My Account
+                                        Notification
+                                    </Link>
+
+                                    <Link
+                                        href="/settings"
+                                        className="rounded-full border border-black/10 px-3 py-2 text-sm font-semibold text-black transition hover:bg-black hover:text-white sm:px-4"
+                                    >
+                                        Settings
                                     </Link>
 
                                     <NotificationBell />
