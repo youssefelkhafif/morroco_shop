@@ -16,10 +16,10 @@ export default function About({ auth, shop_instagram }) {
                 <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                     <div className="space-y-8">
                         <div>
-                            <h1 className="text-5xl font-bold tracking-tight mb-6">
+                            <h1 style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }}  className="text-5xl font-bold tracking-tight mb-6">
                                 About Street Wear Cap
                             </h1>
-                            <p className="text-xl text-gray-600 leading-relaxed">
+                            <p className="text-xl text-muted-foreground leading-relaxed">
                                 Welcome to <span className="font-semibold">Street Wear Cap</span> – a premium headwear ecosystem born in <span className="font-semibold">Casablanca, Morocco</span>. We're dedicated to bringing quality streetwear to the people of Morocco and beyond.
                             </p>
                         </div>
@@ -71,26 +71,26 @@ export default function About({ auth, shop_instagram }) {
 
                 {/* Why Choose Us */}
                 <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 border-t border-black/10">
-                    <h2 className="text-3xl font-bold mb-12 text-center">Why Choose Street Wear Cap</h2>
+                    <h2 style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }}  className="text-3xl font-bold mb-12 text-center">Why Choose Street Wear Cap</h2>
                     <div className="grid gap-8 md:grid-cols-3">
-                        <div className="bg-white p-8 rounded-lg border border-black/10 text-center">
+                        <div className="bg-card p-8 rounded-lg border border-border text-center">
                             <div className="text-4xl mb-4">🇲🇦</div>
                             <h3 className="text-xl font-bold mb-3">Made for Morocco</h3>
-                            <p className="text-gray-600">
+                            <p className="text-muted-foreground">
                                 We understand the Moroccan market and create products specifically for our community's style and preferences.
                             </p>
                         </div>
-                        <div className="bg-white p-8 rounded-lg border border-black/10 text-center">
+                        <div className="bg-card p-8 rounded-lg border border-border text-center">
                             <div className="text-4xl mb-4">✨</div>
                             <h3 className="text-xl font-bold mb-3">Premium Quality</h3>
-                            <p className="text-gray-600">
+                            <p className="text-muted-foreground">
                                 Every product is carefully selected and crafted to meet the highest standards of streetwear fashion.
                             </p>
                         </div>
-                        <div className="bg-white p-8 rounded-lg border border-black/10 text-center">
+                        <div className="bg-card p-8 rounded-lg border border-border text-center">
                             <div className="text-4xl mb-4">💪</div>
                             <h3 className="text-xl font-bold mb-3">Community Driven</h3>
-                            <p className="text-gray-600">
+                            <p className="text-muted-foreground">
                                 We build a strong community of streetwear enthusiasts who share our passion for quality and style.
                             </p>
                         </div>

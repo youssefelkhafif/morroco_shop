@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Category;
+use App\Models\Collection;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\ProductImageService;
@@ -48,6 +49,7 @@ class ProductController extends Controller
     {
         return Inertia::render('admin/products/create', [
             'categories' => $this->categoriesForForm(),
+            'collections' => $this->collectionsForForm(),
         ]);
     }
 
@@ -73,6 +75,7 @@ class ProductController extends Controller
                 'category_id' => $product->category_id,
                 'name' => $product->name,
                 'slug' => $product->slug,
+                'collection_id' => $product->collection_id,
                 'description' => $product->description,
                 'price_mad' => $product->price_mad,
                 'old_price_mad' => $product->old_price_mad,
@@ -98,6 +101,7 @@ class ProductController extends Controller
                     ->all(),
             ],
             'categories' => $this->categoriesForForm(),
+            'collections' => $this->collectionsForForm(),
         ]);
     }
 
@@ -162,6 +166,20 @@ class ProductController extends Controller
                 'id' => $category->id,
                 'name' => $category->name,
                 'is_active' => $category->is_active,
+            ])
+            ->all();
+    }
+
+    private function collectionsForForm(): array
+    {
+        return Collection::query()
+            ->orderByDesc('is_active')
+            ->orderBy('title')
+            ->get(['id', 'title', 'is_active'])
+            ->map(fn(Collection $collection) => [
+                'id' => $collection->id,
+                'title' => $collection->title,
+                'is_active' => $collection->is_active,
             ])
             ->all();
     }

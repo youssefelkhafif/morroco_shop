@@ -17,6 +17,7 @@ class StoreProductRequest extends FormRequest
         $this->merge([
             'is_active' => $this->boolean('is_active'),
             'is_featured' => $this->boolean('is_featured'),
+            'collection_id' => $this->input('collection_id') ?: null,
         ]);
     }
 
@@ -27,6 +28,11 @@ class StoreProductRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::exists('categories', 'id'),
+            ],
+            'collection_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('collections', 'id'),
             ],
             'name' => [
                 'required',
