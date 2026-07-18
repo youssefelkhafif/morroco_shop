@@ -65,9 +65,27 @@ export default function ShopNavigation({ auth, cartItemCount }) {
             <header className="sticky top-0 z-30 border-b border-black/10 bg-background/90 backdrop-blur">
                 <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
                     <Link href="/" className="flex items-center gap-2 text-base font-black uppercase tracking-[0.28em] text-foreground">
-                        <Sparkles className="h-4 w-4" />
-                        <span>Streetwear Caps</span>
+                        {/* <Sparkles className="h-4 w-4" /> */}
+                        <span style={{ fontFamily: '"Bodoni Moda", serif' }}>Streetwear Cap</span>
                     </Link>
+
+                    <div className="flex items-center justify-center bg-transparent border-none">
+                        {resolvedAppearance === 'dark' ? (
+                            <img
+                                src="/images/anas-logo-white.png"
+                                alt="Streetwear Caps logo white"
+                                className="h-10 w-auto object-contain bg-transparent"
+                                style={{ backgroundColor: 'transparent' }}
+                            />
+                        ) : (
+                            <img
+                                src="/images/anas_logo.png"
+                                alt="Streetwear Caps logo"
+                                className="h-10 w-auto object-contain bg-transparent"
+                                style={{ backgroundColor: 'transparent' }}
+                            />
+                        )}
+                    </div>
 
                     <div className="flex items-center gap-2">
                         <button

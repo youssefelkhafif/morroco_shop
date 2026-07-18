@@ -6,6 +6,7 @@ export default function EditCollection({ collection }) {
         title: collection.title,
         subtitle: collection.subtitle,
         badge: collection.badge,
+        image: null,
         image_url: collection.image_url || '',
         sort_order: collection.sort_order,
         is_active: collection.is_active,
@@ -13,7 +14,7 @@ export default function EditCollection({ collection }) {
 
     function submit(e) {
         e.preventDefault();
-        patch(`/admin/collections/${collection.id}`);
+        patch(`/admin/collections/${collection.id}`, { forceFormData: true });
     }
 
     return (
@@ -88,16 +89,26 @@ export default function EditCollection({ collection }) {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-foreground">
-                                            Image URL
-                                        </label>
+                                        <label className="block text-sm font-medium text-foreground">Upload Image</label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => setData('image', e.target.files[0])}
+                                            className="mt-1 block w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                                        />
+                                        <p className="mt-2 text-sm text-muted-foreground">Or change the external image URL below.</p>
+
+                                        <label className="mt-3 block text-sm font-medium text-foreground">Image URL</label>
                                         <input
                                             type="text"
                                             value={data.image_url}
                                             onChange={(e) => setData('image_url', e.target.value)}
                                             className="mt-1 block w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                                            placeholder="e.g., https://dummyimage.com/400x300/000000/000000"
+                                            placeholder="e.g., https://example.com/image.png"
                                         />
+                                        {errors.image && (
+                                            <p className="mt-1 text-sm text-destructive">{errors.image}</p>
+                                        )}
                                         {errors.image_url && (
                                             <p className="mt-1 text-sm text-destructive">{errors.image_url}</p>
                                         )}

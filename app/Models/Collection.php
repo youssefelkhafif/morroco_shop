@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Collection extends Model
 {
@@ -24,5 +26,12 @@ class Collection extends Model
             'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class)
+            ->orderByDesc('is_featured')
+            ->orderBy('name');
     }
 }

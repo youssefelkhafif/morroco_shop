@@ -60,67 +60,48 @@ export default function ShopHome({
             <main className="min-h-screen bg-background text-foreground">
                 <ShopNavigation auth={auth} cartItemCount={cartItemCount} />
 
-                <section className="relative overflow-hidden border-b border-border bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.95),rgba(239,235,228,0.72))] dark:bg-[radial-gradient(circle_at_top_left,rgba(40,40,40,0.6),rgba(20,20,20,0.9))]">
-                    <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
+                <section className="relative overflow-hidden border-b border-border bg-cover bg-top-right sm:bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-images-ans.png')" }}>
+                    <div className="absolute inset-0 bg-black/10" />
+                    <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                         <div className="flex flex-col justify-center">
-                            <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.32em] text-muted-foreground backdrop-blur">
-                                <Sparkles className="h-3.5 w-3.5" />
+                            <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/20 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/90 backdrop-blur">
+                                {/* <Sparkles className="h-3.5 w-3.5" /> */}
                                 <span>{hero_badge}</span>
                             </div>
 
-                            <h1 className="max-w-3xl text-5xl font-black leading-[0.9] tracking-[-0.03em] sm:text-6xl lg:text-7xl">
+                            <h1
+                                style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }}
+                                className="max-w-3xl text-5xl leading-[0.9] tracking-[-0.03em] text-white sm:text-6xl lg:text-7xl"
+                            >
                                 {hero_title}
                             </h1>
 
-                            <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
+                            <p className="mt-6 max-w-2xl text-base leading-8 text-white/80 sm:text-lg">
                                 {hero_subtitle}
                             </p>
 
                             <div className="mt-8 flex flex-wrap gap-3">
-                                <Link href="#collection" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">
+                                <Link href="/collections" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90">
                                     Shop now
                                     <ArrowRight className="h-4 w-4" />
                                 </Link>
-                                <Link href="#collections" className="rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition hover:bg-muted">
+                                <Link href="#collections" className="rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
                                     Explore collection
                                 </Link>
                             </div>
 
-                            <div className="mt-10 flex flex-wrap gap-6 border-t border-border pt-6 text-sm text-muted-foreground">
+                            <div className="mt-10 flex flex-wrap gap-6 border-t border-white/10 pt-6 text-sm text-white/80">
                                 <div>
-                                    <p className="font-semibold text-foreground">Premium fit</p>
+                                    <p className="font-semibold text-white">Premium fit</p>
                                     <p>Editorial silhouettes</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-foreground">Limited drops</p>
+                                    <p className="font-semibold text-white">Limited drops</p>
                                     <p>New every season</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-foreground">Cash on delivery</p>
+                                    <p className="font-semibold text-white">Cash on delivery</p>
                                     <p>Built for Morocco</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="relative">
-                            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-primary/10 via-transparent to-muted/50 blur-3xl" />
-                            <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card/90 p-3 shadow-[0_40px_120px_rgba(0,0,0,0.16)] backdrop-blur">
-                                <div className="overflow-hidden rounded-[1.5rem] bg-muted/70">
-                                    {featuredProduct?.image_url ? (
-                                        <img src={featuredProduct.image_url} alt={featuredProduct.name} className="aspect-[4/5] w-full object-cover transition duration-700 hover:scale-105" />
-                                    ) : (
-                                        <div className="flex aspect-[4/5] items-center justify-center text-sm text-muted-foreground">Featured product image</div>
-                                    )}
-                                </div>
-                                <div className="mt-4 flex items-end justify-between gap-3 px-2 pb-2">
-                                    <div>
-                                        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Featured drop</p>
-                                        <h2 className="mt-1 text-xl font-black">{featuredProduct?.name ?? 'Signature cap'}</h2>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-sm text-muted-foreground">From</p>
-                                        <p className="text-xl font-black">{featuredProduct ? formatMad(featuredProduct.price_mad) : 'MAD 0.00'}</p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -131,7 +112,7 @@ export default function ShopHome({
                     <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-muted-foreground">Collections</p>
-                            <h2 className="text-3xl font-black sm:text-4xl">Designed for every mood</h2>
+                            <h2 style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }} className="text-3xl font-black sm:text-4xl">Designed for every mood</h2>
                         </div>
                         <p className="max-w-2xl text-sm leading-7 text-muted-foreground">A premium structure built to grow from caps into a wider fashion universe without losing its identity.</p>
                     </div>
@@ -176,8 +157,8 @@ export default function ShopHome({
                                         <p className="mb-3 w-fit rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/90 backdrop-blur">{collection.badge}</p>
                                         <h3 className="text-2xl font-black text-white">{collection.title}</h3>
                                         <p className="mt-2 max-w-sm text-sm leading-7 text-white/80">{collection.subtitle}</p>
-                                        <Link href="#collection" className="mt-6 inline-flex w-fit items-center gap-2 text-sm font-semibold text-white">
-                                            View edit
+                                        <Link href={`/collections/${collection.id}`} className="mt-6 inline-flex w-fit items-center gap-2 text-sm font-semibold text-white">
+                                            View collection
                                             <ArrowRight className="h-4 w-4" />
                                         </Link>
                                     </div>
@@ -191,7 +172,7 @@ export default function ShopHome({
                     <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-muted-foreground">Featured products</p>
-                            <h2 className="text-3xl font-black sm:text-4xl">Modern essentials, built to last</h2>
+                            <h2 style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }} className="text-3xl font-black sm:text-4xl">Modern essentials, built to last</h2>
                         </div>
                     </div>
 
@@ -207,25 +188,26 @@ export default function ShopHome({
                                 const isAdding = addingProductId === product.id;
 
                                 return (
-                                    <article key={product.id} className="group min-w-[270px] max-w-[270px] flex-shrink-0 snap-start overflow-hidden rounded-[1.75rem] border border-border bg-card p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:min-w-[290px] sm:max-w-[290px]">
+                                    <article key={product.id} className="relative group min-w-[270px] max-w-[270px] flex-shrink-0 snap-start overflow-hidden rounded-[1.75rem] border border-border bg-card p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:min-w-[290px] sm:max-w-[290px]">
+                                        <Link href={`/products/${product.id}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`} />
                                         <div className="relative overflow-hidden rounded-[1.25rem] bg-muted/80">
                                             {product.image_url ? (
                                                 <img src={product.image_url} alt={product.name} className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.04]" />
                                             ) : (
                                                 <div className="flex aspect-[4/5] items-center justify-center text-sm text-muted-foreground">No product image</div>
                                             )}
-                                            <button type="button" className="absolute right-3 top-3 rounded-full border border-white/40 bg-white/80 p-2 text-foreground backdrop-blur transition hover:bg-white" aria-label={`Add ${product.name} to wishlist`}>
+                                            <button type="button" className="absolute right-3 top-3 z-10 rounded-full border border-white/40 bg-white/80 p-2 text-foreground backdrop-blur transition hover:bg-white" aria-label={`Add ${product.name} to wishlist`}>
                                                 <Heart className="h-4 w-4" />
                                             </button>
                                         </div>
 
-                                        <div className="px-1 pb-1 pt-4">
+                                        <div className="relative z-10 px-1 pb-1 pt-4">
                                             <div className="flex items-center justify-between gap-2">
                                                 <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">{product.category_name ?? 'Signature'}</p>
                                                 <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{isOutOfStock ? 'Sold out' : 'In stock'}</span>
                                             </div>
 
-                                            <Link href={`/products/${product.id}`} className="mt-3 block text-lg font-black uppercase tracking-[0.03em] transition hover:text-muted-foreground">{product.name}</Link>
+                                            <div className="mt-3 block text-lg font-black uppercase tracking-[0.03em] text-foreground">{product.name}</div>
 
                                             <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
                                                 <span className="h-2.5 w-2.5 rounded-full bg-foreground" />
@@ -234,7 +216,7 @@ export default function ShopHome({
 
                                             <div className="mt-4 flex items-end justify-between gap-3">
                                                 <p className="text-lg font-black">{formatMad(product.price_mad)}</p>
-                                                <button type="button" disabled={isOutOfStock || isAdding} onClick={() => addToCart(product)} className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:bg-foreground/40">
+                                                <button type="button" disabled={isOutOfStock || isAdding} onClick={() => addToCart(product)} className="relative z-20 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:bg-foreground/40">
                                                     {isAdding ? 'Adding...' : 'Quick add'}
                                                 </button>
                                             </div>
@@ -268,14 +250,15 @@ export default function ShopHome({
                 <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                         <div>
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-muted-foreground">New arrivals</p>
-                            <h2 className="text-3xl font-black sm:text-4xl">Fresh from the studio</h2>
+                            <p style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }} className="text-[11px] font-semibold uppercase tracking-[0.35em] text-muted-foreground">New arrivals</p>
+                            <h2 style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }} className="text-3xl font-black sm:text-4xl">Fresh from the studio</h2>
                         </div>
                     </div>
 
                     <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory touch-pan-x">
                         {arrivals.map((product) => (
-                            <div key={product.id} className="group min-w-[270px] max-w-[270px] flex-shrink-0 snap-start overflow-hidden rounded-[1.5rem] border border-border bg-card p-3 transition duration-300 hover:-translate-y-1 sm:min-w-[290px] sm:max-w-[290px]">
+                            <div key={product.id} className="relative group cursor-pointer min-w-[270px] max-w-[270px] flex-shrink-0 snap-start overflow-hidden rounded-[1.5rem] border border-border bg-card p-3 transition duration-300 hover:-translate-y-1 sm:min-w-[290px] sm:max-w-[290px]">
+                                <Link href={`/products/${product.id}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`} />
                                 <div className="overflow-hidden rounded-[1.15rem] bg-muted/70">
                                     {product.image_url ? (
                                         <img src={product.image_url} alt={product.name} className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.04]" />
@@ -283,12 +266,12 @@ export default function ShopHome({
                                         <div className="flex aspect-[4/5] items-center justify-center text-sm text-muted-foreground">Preview</div>
                                     )}
                                 </div>
-                                <div className="mt-4 px-1 pb-1">
+                                        <div className="relative z-20 mt-4 px-1 pb-1">
                                     <div className="flex items-center justify-between gap-2">
-                                        <p className="text-sm font-semibold">{product.name}</p>
+                                        <Link href={`/products/${product.id}`} className="text-sm font-semibold text-foreground hover:text-muted-foreground">{product.name}</Link>
                                         <p className="text-sm font-semibold">{formatMad(product.price_mad)}</p>
                                     </div>
-                                    <button type="button" onClick={() => addToCart(product)} className="mt-4 w-full rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted">
+                                    <button type="button" onClick={() => addToCart(product)} className="relative z-20 mt-4 w-full rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted">
                                         Quick add
                                     </button>
                                 </div>
@@ -329,7 +312,7 @@ export default function ShopHome({
                 <footer className="border-t border-border bg-card/70">
                     <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 text-sm text-muted-foreground sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8">
                         <div>
-                            <p className="text-lg font-black uppercase tracking-[0.28em] text-foreground">Streetwear Caps</p>
+                            <p style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }}  className="text-lg font-black uppercase tracking-[0.28em] text-foreground">Streetwear Cap</p>
                             <p className="mt-3 max-w-sm leading-7">Minimal luxury for everyday wear, crafted for a new generation of streetwear lovers.</p>
                         </div>
                         <div className="grid gap-8 sm:grid-cols-3">

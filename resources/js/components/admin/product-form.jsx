@@ -7,11 +7,12 @@ const toSlug = (value) =>
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
 
-export default function ProductForm({ product = null, categories = [] }) {
+export default function ProductForm({ product = null, categories = [], collections = [] }) {
     const isEditing = Boolean(product);
 
     const { data, setData, post, put, processing, errors } = useForm({
         category_id: product?.category_id?.toString() ?? '',
+        collection_id: product?.collection_id?.toString() ?? '',
         name: product?.name ?? '',
         slug: product?.slug ?? '',
         description: product?.description ?? '',
@@ -81,37 +82,72 @@ export default function ProductForm({ product = null, categories = [] }) {
             className="space-y-6 rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm"
         >
             <div className="grid gap-6 md:grid-cols-2">
-                <div className="md:col-span-2">
-                    <label
-                        htmlFor="category_id"
-                        className="block text-sm font-medium"
-                    >
-                        Category
-                    </label>
+                <div className="md:col-span-2 grid gap-6 lg:grid-cols-[1fr_1fr]">
+                    <div>
+                        <label
+                            htmlFor="category_id"
+                            className="block text-sm font-medium"
+                        >
+                            Category
+                        </label>
 
-                    <select
-                        id="category_id"
-                        value={data.category_id}
-                        onChange={(event) =>
-                            setData('category_id', event.target.value)
-                        }
-                        className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none ring-ring focus:ring-2"
-                    >
-                        <option value="">Select a category</option>
+                        <select
+                            id="category_id"
+                            value={data.category_id}
+                            onChange={(event) =>
+                                setData('category_id', event.target.value)
+                            }
+                            className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none ring-ring focus:ring-2"
+                        >
+                            <option value="">Select a category</option>
 
-                        {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                                {!category.is_active ? ' (Inactive)' : ''}
-                            </option>
-                        ))}
-                    </select>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                    {!category.is_active ? ' (Inactive)' : ''}
+                                </option>
+                            ))}
+                        </select>
 
-                    {errors.category_id && (
-                        <p className="mt-2 text-sm text-destructive">
-                            {errors.category_id}
-                        </p>
-                    )}
+                        {errors.category_id && (
+                            <p className="mt-2 text-sm text-destructive">
+                                {errors.category_id}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label
+                            htmlFor="collection_id"
+                            className="block text-sm font-medium"
+                        >
+                            Collection
+                        </label>
+
+                        <select
+                            id="collection_id"
+                            value={data.collection_id}
+                            onChange={(event) =>
+                                setData('collection_id', event.target.value)
+                            }
+                            className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none ring-ring focus:ring-2"
+                        >
+                            <option value="">Select a collection</option>
+
+                            {collections.map((collection) => (
+                                <option key={collection.id} value={collection.id}>
+                                    {collection.title}
+                                    {!collection.is_active ? ' (Inactive)' : ''}
+                                </option>
+                            ))}
+                        </select>
+
+                        {errors.collection_id && (
+                            <p className="mt-2 text-sm text-destructive">
+                                {errors.collection_id}
+                            </p>
+                        )}
+                    </div>
                 </div>
 
                 <div>

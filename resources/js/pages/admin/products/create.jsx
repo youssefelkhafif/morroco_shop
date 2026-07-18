@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import ProductForm from '@/components/admin/product-form';
 
-export default function CreateProduct({ categories }) {
+export default function CreateProduct({ categories, collections }) {
     return (
         <>
             <Head title="Create Product" />
@@ -25,7 +25,7 @@ export default function CreateProduct({ categories }) {
                         </p>
                     </div>
 
-                    <ProductForm categories={categories} />
+                    <ProductForm categories={categories} collections={collections} />
                 </div>
             </main>
         </>

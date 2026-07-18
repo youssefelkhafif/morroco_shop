@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class CollectionController extends Controller
@@ -27,10 +28,16 @@ class CollectionController extends Controller
             'title' => 'required|string|max:255',
             'subtitle' => 'required|string',
             'badge' => 'required|string|max:255',
+            'image' => 'nullable|image|max:4096',
             'image_url' => 'nullable|string|url',
             'sort_order' => 'integer|min:0',
             'is_active' => 'boolean',
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('images', 'public');
+            $validated['image_url'] = Storage::url($path);
+        }
 
         Collection::create($validated);
 
@@ -50,10 +57,16 @@ class CollectionController extends Controller
             'title' => 'required|string|max:255',
             'subtitle' => 'required|string',
             'badge' => 'required|string|max:255',
+            'image' => 'nullable|image|max:4096',
             'image_url' => 'nullable|string|url',
             'sort_order' => 'integer|min:0',
             'is_active' => 'boolean',
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('images', 'public');
+            $validated['image_url'] = Storage::url($path);
+        }
 
         $collection->update($validated);
 

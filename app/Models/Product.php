@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,7 @@ class Product extends Model
 
     protected $fillable = [
         'category_id',
+        'collection_id',
         'name',
         'slug',
         'description',
@@ -37,6 +39,11 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function collection(): BelongsTo
+    {
+        return $this->belongsTo(Collection::class);
     }
 
     public function images(): HasMany

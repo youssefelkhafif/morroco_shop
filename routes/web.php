@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ThemeController;
 use App\Http\Controllers\Admin\CollectionController;
 use App\Http\Controllers\Shop\CartController;
+use App\Http\Controllers\Shop\CollectionController as ShopCollectionController;
 use App\Http\Controllers\Shop\HomeController;
 use App\Http\Controllers\Shop\CheckoutController;
 use App\Http\Controllers\Shop\AccountController;
@@ -20,6 +21,10 @@ Route::get('/about', function () {
         'shop_instagram' => config('shop.instagram.handle'),
     ]);
 })->name('about');
+Route::get('/collections', [ShopCollectionController::class, 'index'])
+    ->name('collections.index');
+Route::get('/collections/{collection}', [ShopCollectionController::class, 'show'])
+    ->name('collections.show');
 Route::get('/products/{product}', [ShopProductController::class, 'show'])
     ->name('products.show');
 
