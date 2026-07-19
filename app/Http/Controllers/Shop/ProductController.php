@@ -11,6 +11,37 @@ use Inertia\Response;
 
 class ProductController extends Controller
 {
+    public function index(CartService $cartService): Response
+    {
+        $products = Product::where('is_active', true)
+            ->with(['category', 'images', 'colors'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        return Inertia::render('shop/products/index', [
+            'products' => $products->map(fn (Product $product) => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'category_name' => $product->category?->name,
+                'price_mad' => $product->price_mad,
+                'old_price_mad' => $product->old_price_mad,
+                'stock_quantity' => $product->stock_quantity,
+                'is_featured' => $product->is_featured,
+                'image_url' => $product->images->first()
+                    ? Storage::disk('public')->url($product->images->first()->path)
+                    : null,
+            ])->all(),
+            'paginated' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'total' => $products->total(),
+                'per_page' => $products->perPage(),
+            ],
+            'cart_item_count' => $cartService->summary()['item_count'],
+        ]);
+    }
+
     public function show(Product $product, CartService $cartService): Response
     {
         $product->load(['category', 'images']);

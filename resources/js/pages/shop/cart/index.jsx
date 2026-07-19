@@ -1,4 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import ShopNavigation from '@/components/shop-navigation';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -40,9 +41,13 @@ export default function CartIndex({ cart }) {
         });
     }
 
+    const { auth } = usePage().props;
+
     return (
         <>
             <Head title="Cart" />
+
+            <ShopNavigation auth={auth} cartItemCount={cart.item_count} />
 
             <main className="min-h-screen bg-background p-6 text-foreground">
                 <div className="mx-auto max-w-5xl">

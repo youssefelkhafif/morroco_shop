@@ -18,7 +18,7 @@ const accountLinks = [
 
 const infoLinks = [
     { label: 'About Us', href: '/about', icon: Info },
-    { label: 'Contact', href: 'mailto:hello@streetwearcaps.com', icon: Phone },
+    { label: 'Contact', href: '/contact', icon: Phone },
     { label: 'Shipping Policy', href: '/about', icon: Truck },
     { label: 'Return Policy', href: '/about', icon: RotateCcw },
     { label: 'Privacy Policy', href: '/about', icon: ShieldCheck },
@@ -34,6 +34,17 @@ export default function ShopNavigation({ auth, cartItemCount }) {
     const unreadCount = notifications?.unread_count ?? 0;
     const latestNotifications = notifications?.latest ?? [];
     const visibleNotifications = isAllRead ? [] : latestNotifications;
+
+    const handleMarkAllRead = () => {
+        router.post('/notification/mark-all-read', {
+            preserveScroll: true,
+            onSuccess: () => {
+                setIsAllRead(true);
+                setIsNotificationsOpen(false);
+                router.reload({ only: ['notifications'] });
+            },
+        });
+    };
 
     const isAuthenticated = Boolean(auth?.user);
     const roleLabel = auth?.user?.is_admin ? 'Admin' : 'Customer';
@@ -149,16 +160,6 @@ export default function ShopNavigation({ auth, cartItemCount }) {
                                 visibleNotifications.map((notification) => (
                                     <div key={notification.id} className="rounded-2xl border border-black/10 bg-[#f7f6f1] p-3">
                                         <p className="text-sm font-semibold text-black">{notification.message}</p>
-                                        {notification.whatsapp_url && (
-                                            <a
-                                                href={notification.whatsapp_url}
-                                                target="_blank"
-                                                rel="noreferrer noopener"
-                                                className="mt-2 inline-flex rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white"
-                                            >
-                                                Open WhatsApp
-                                            </a>
-                                        )}
                                     </div>
                                 ))
                             )}
@@ -167,10 +168,7 @@ export default function ShopNavigation({ auth, cartItemCount }) {
                         <div className="mt-4 flex items-center justify-between gap-3 border-t border-black/10 pt-4">
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setIsAllRead(true);
-                                    setIsNotificationsOpen(false);
-                                }}
+                                onClick={handleMarkAllRead}
                                 className="text-sm font-semibold text-black/70 transition hover:text-black"
                             >
                                 Mark all read

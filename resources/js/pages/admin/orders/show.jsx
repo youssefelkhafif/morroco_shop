@@ -7,11 +7,16 @@ const formatMad = (value) =>
         minimumFractionDigits: 2,
     }).format(Number(value));
 
-const formatStatus = (status) =>
-    status
+const formatStatus = (status) => {
+    if (status === 'pending_whatsapp_confirmation') {
+        return 'Pending confirmation';
+    }
+
+    return status
         .split('_')
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(' ');
+};
 
 export default function ShowOrder({ order }) {
     const isPending =
@@ -40,7 +45,7 @@ export default function ShowOrder({ order }) {
 
     function cancelOrder() {
         const confirmed = window.confirm(
-            'Cancel this order? This will stop the pending WhatsApp flow.',
+            'Cancel this order? This will stop the pending order.',
         );
 
         if (!confirmed) {

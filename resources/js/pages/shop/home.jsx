@@ -55,7 +55,7 @@ export default function ShopHome({
 
     return (
         <>
-            <Head title="Morocco Shop | Streetwear Caps" />
+            <Head title=" Streetwear Cap | Streetwear Cap" />
 
             <main className="min-h-screen bg-background text-foreground">
                 <ShopNavigation auth={auth} cartItemCount={cartItemCount} />
@@ -81,11 +81,11 @@ export default function ShopHome({
                             </p>
 
                             <div className="mt-8 flex flex-wrap gap-3">
-                                <Link href="/collections" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90">
+                                <Link href="/products" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90">
                                     Shop now
                                     <ArrowRight className="h-4 w-4" />
                                 </Link>
-                                <Link href="#collections" className="rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
+                                <Link href="/collections" className="rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
                                     Explore collection
                                 </Link>
                             </div>
@@ -231,18 +231,19 @@ export default function ShopHome({
                 <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                     <div className="overflow-hidden rounded-[2rem] border border-border bg-black text-white">
                         <div className="grid gap-8 px-6 py-10 sm:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-14 lg:py-16">
-                            <div className="flex flex-col justify-center">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/65">Editorial drop</p>
-                                <h2 className="mt-3 text-4xl font-black leading-tight sm:text-5xl">Designed for the streets. Built for everyday.</h2>
-                                <p className="mt-5 max-w-xl text-base leading-8 text-white/70">Elevated essentials for the city, the studio, and the weekend reset.</p>
-                                <Link href="#collection" className="mt-8 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
-                                    Explore collection
-                                    <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            </div>
-                            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-4 backdrop-blur">
-                                <div className="h-full min-h-[280px] rounded-[1.2rem] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.3),rgba(0,0,0,0.7))]" />
-                            </div>
+                                <div className="relative lg:col-span-2 flex flex-col justify-center overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/10 p-4 backdrop-blur min-h-[280px] lg:min-h-[360px]">
+                                    <video src="/video/0718.mp4" autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/45" />
+                                    <div className="relative z-10">
+                                        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/65">Editorial drop</p>
+                                        <h2 className="mt-3 text-4xl font-black leading-tight sm:text-5xl">Designed for the streets. Built for everyday.</h2>
+                                        <p className="mt-5 max-w-xl text-base leading-8 text-white/70">Elevated essentials for the city, the studio, and the weekend reset.</p>
+                                        <Link href="#collection" className="mt-8 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
+                                            Explore collection
+                                            <ArrowRight className="h-4 w-4" />
+                                        </Link>
+                                    </div>
+                                </div>
                         </div>
                     </div>
                 </section>

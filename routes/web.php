@@ -21,10 +21,18 @@ Route::get('/about', function () {
         'shop_instagram' => config('shop.instagram.handle'),
     ]);
 })->name('about');
+Route::get('/contact', function () {
+    return inertia('shop/contact', [
+        'contact_email' => config('shop.contact.email'),
+        'contact_phone' => config('shop.contact.phone'),
+    ]);
+})->name('contact');
 Route::get('/collections', [ShopCollectionController::class, 'index'])
     ->name('collections.index');
 Route::get('/collections/{collection}', [ShopCollectionController::class, 'show'])
     ->name('collections.show');
+Route::get('/products', [ShopProductController::class, 'index'])
+    ->name('products.index');
 Route::get('/products/{product}', [ShopProductController::class, 'show'])
     ->name('products.show');
 

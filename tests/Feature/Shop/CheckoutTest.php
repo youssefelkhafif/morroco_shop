@@ -62,9 +62,7 @@ it('shows checkout with active delivery zones and session cart data', function (
         );
 });
 
-it('creates a guest order from session cart and redirects to WhatsApp', function () {
-    config()->set('shop.whatsapp.number', '212600000000');
-
+it('creates a guest order from session cart and saves the order for admin confirmation', function () {
     $product = Product::factory()->create([
         'name' => 'Wireless Headphones',
         'slug' => 'wireless-headphones',
@@ -90,8 +88,9 @@ it('creates a guest order from session cart and redirects to WhatsApp', function
         ])
         ->post(route('checkout.store'), checkoutPayload($zone));
 
-    $response->assertStatus(409)
-        ->assertHeader('X-Inertia-Location');
+    $response->assertRedirect(route('checkout.index'))
+        ->assertSessionHas('success')
+        ->assertSessionHas('orderPlaced', true);
 
     $order = Order::query()->sole();
 
@@ -104,19 +103,11 @@ it('creates a guest order from session cart and redirects to WhatsApp', function
         ->and($order->items)->toHaveCount(1)
         ->and($order->items->first()->quantity)->toBe(2);
 
-    $whatsAppUrl = $response->headers->get('X-Inertia-Location');
-
-    expect($whatsAppUrl)->toStartWith('https://wa.me/212600000000?text=')
-        ->and(urldecode($whatsAppUrl))->toContain($order->order_number)
-        ->and(urldecode($whatsAppUrl))->toContain('Wireless Headphones');
-
     expect(session()->has('morocco_shop.cart'))->toBeFalse();
     expect($product->fresh()->stock_quantity)->toBe(10);
 });
 
 it('links an authenticated customer to the created checkout order', function () {
-    config()->set('shop.whatsapp.number', '212600000000');
-
     $customer = User::factory()->create([
         'email' => 'customer@example.test',
     ]);
@@ -141,7 +132,9 @@ it('links an authenticated customer to the created checkout order', function () 
             ...checkoutPayload($zone),
             'customer_email' => null,
         ])
-        ->assertStatus(409);
+        ->assertRedirect(route('checkout.index'))
+        ->assertSessionHas('success')
+        ->assertSessionHas('orderPlaced', true);
 
     expect(Order::query()->sole()->customer_id)->toBe($customer->id)
         ->and(Order::query()->sole()->customer_email)->toBe(
@@ -149,9 +142,7 @@ it('links an authenticated customer to the created checkout order', function () 
         );
 });
 
-it('does not create an order when WhatsApp is not configured', function () {
-    config()->set('shop.whatsapp.number', null);
-
+it('creates an order when WhatsApp is not configured', function () {
     $product = Product::factory()->create([
         'stock_quantity' => 4,
         'is_active' => true,
@@ -166,8 +157,10 @@ it('does not create an order when WhatsApp is not configured', function () {
             $product->id => 1,
         ],
     ])->post(route('checkout.store'), checkoutPayload($zone))
-        ->assertSessionHasErrors('checkout');
+        ->assertRedirect(route('checkout.index'))
+        ->assertSessionHas('success')
+        ->assertSessionHas('orderPlaced', true);
 
-    expect(Order::count())->toBe(0)
-        ->and(session()->has('morocco_shop.cart'))->toBeTrue();
+    expect(Order::count())->toBe(1)
+        ->and(session()->has('morocco_shop.cart'))->toBeFalse();
 });

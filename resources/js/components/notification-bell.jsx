@@ -57,16 +57,6 @@ export default function NotificationBell() {
                                     <p className="text-sm font-semibold text-slate-900">
                                         {notification.message}
                                     </p>
-                                    {notification.whatsapp_url && (
-                                        <a
-                                            href={notification.whatsapp_url}
-                                            target="_blank"
-                                            rel="noreferrer noopener"
-                                            className="mt-3 inline-flex rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
-                                        >
-                                            Open WhatsApp
-                                        </a>
-                                    )}
                                 </article>
                             ))}
                         </div>
