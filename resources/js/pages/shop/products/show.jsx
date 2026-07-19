@@ -47,6 +47,24 @@ export default function ProductShow({ product, cart_item_count: cartItemCount })
         );
     }
 
+    function buyNow() {
+        setIsAdding(true);
+
+        router.post(
+            '/cart/items',
+            {
+                product_id: product.id,
+                quantity: 1,
+                color_id: selectedColorId,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => router.visit('/checkout'),
+                onFinish: () => setIsAdding(false),
+            },
+        );
+    }
+
     return (
         <>
             <Head title={`${product.name} | Morocco Shop`} />
@@ -54,7 +72,7 @@ export default function ProductShow({ product, cart_item_count: cartItemCount })
             <main className="min-h-screen bg-background text-foreground">
                 <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur">
                     <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-                        <Link href="/" className="text-base font-black uppercase tracking-[0.24em] text-foreground">
+                        <Link style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }} href="/" className="text-base font-black uppercase tracking-[0.24em] text-foreground">
                             Streetwear Cap
                         </Link>
                         <div className="flex items-center gap-3">
@@ -180,7 +198,7 @@ export default function ProductShow({ product, cart_item_count: cartItemCount })
                                         Order now
                                     </p>
                                     <p className="mt-2 text-sm text-muted-foreground">
-                                        Cash on delivery - confirm your order on WhatsApp after checkout.
+                                        Cash on delivery - your order will be reviewed and confirmed by admin after checkout.
                                     </p>
                                 </div>
 
@@ -240,12 +258,14 @@ export default function ProductShow({ product, cart_item_count: cartItemCount })
                                 {isAdding ? 'Adding…' : 'Add to cart'}
                             </button>
 
-                            <Link
-                                href="/checkout"
-                                className="inline-flex w-full items-center justify-center rounded-full border border-border px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-foreground transition hover:bg-foreground/10"
+                            <button
+                                type="button"
+                                disabled={product.stock_quantity < 1 || isAdding}
+                                onClick={buyNow}
+                                className="inline-flex w-full items-center justify-center rounded-full border border-border px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-foreground transition hover:bg-foreground/10 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
                             >
-                                Buy now
-                            </Link>
+                                {isAdding ? 'Processing…' : 'Buy now'}
+                            </button>
 
                             <div className="space-y-4 rounded-[1.5rem] border border-border bg-card p-5">
                                 <div className="flex items-start gap-3">

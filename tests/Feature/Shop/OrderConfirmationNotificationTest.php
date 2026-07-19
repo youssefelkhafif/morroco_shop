@@ -58,6 +58,5 @@ it('creates a notification when an admin confirms a customer order', function ()
         ->assertInertia(fn (Assert $page) => $page
             ->where('notifications.unread_count', 1)
             ->has('notifications.latest.0.message')
-            ->has('notifications.latest.0.whatsapp_url')
         );
 });

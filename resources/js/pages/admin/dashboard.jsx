@@ -6,7 +6,7 @@ const notifications = [
     {
         id: 1,
         title: 'Pending confirmations',
-        description: '2 orders are waiting for WhatsApp approval.',
+        description: '2 orders are waiting for admin approval.',
     },
     {
         id: 2,
@@ -34,7 +34,7 @@ export default function AdminDashboard() {
                             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">
-                                        Morocco Shop
+                                        Streetwear Cap
                                     </p>
 
                                     <h1 className="text-3xl font-bold">
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
                             </h2>
 
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Review incoming orders, confirm pending WhatsApp orders, and cancel them when needed.
+                                Review incoming orders, confirm pending orders, and cancel them when needed.
                             </p>
 
                             <Link

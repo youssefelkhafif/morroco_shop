@@ -22,7 +22,7 @@ export default function AdminSidebar({ currentPath = '/admin' }) {
         <aside className="hidden w-72 shrink-0 flex-col border-l border-border bg-card/70 p-6 text-card-foreground shadow-sm lg:flex">
             <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                    Morocco Shop
+                    Streetwear Cap
                 </p>
                 <h2 className="mt-2 text-xl font-semibold">
                     Admin navigation

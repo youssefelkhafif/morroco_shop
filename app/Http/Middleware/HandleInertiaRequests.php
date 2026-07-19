@@ -52,7 +52,6 @@ class HandleInertiaRequests extends Middleware
                     'id' => $notification->id,
                     'type' => class_basename($notification->type),
                     'message' => $notification->data['message'] ?? null,
-                    'whatsapp_url' => $notification->data['whatsapp_url'] ?? null,
                     'created_at' => $notification->created_at?->toISOString(),
                 ])->values()->all(),
             ],

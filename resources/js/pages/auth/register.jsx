@@ -22,8 +22,8 @@ export default function Register() {
 
             <main className="flex min-h-screen items-center justify-center bg-stone-100 px-4 py-10 text-stone-950">
                 <section className="w-full max-w-md rounded-3xl bg-white p-8 shadow-sm ring-1 ring-stone-200">
-                    <Link href="/" className="text-lg font-black tracking-tight">
-                        Morocco Shop
+                    <Link style={{ fontFamily: '"Bodoni Moda", serif', fontWeight: 700 }} href="/" className="text-lg font-black tracking-tight">
+                        Streetwear Cap
                     </Link>
 
                     <h1 className="mt-8 text-3xl font-black">Create your account</h1>

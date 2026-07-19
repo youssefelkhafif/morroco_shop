@@ -144,7 +144,7 @@ class OrderService
                 !== Order::STATUS_PENDING_WHATSAPP_CONFIRMATION
             ) {
                 throw ValidationException::withMessages([
-                    'status' => 'Only pending WhatsApp orders can be confirmed.',
+                    'status' => 'Only pending orders can be confirmed.',
                 ]);
             }
 
@@ -221,7 +221,7 @@ class OrderService
 
             if ($order->status !== Order::STATUS_PENDING_WHATSAPP_CONFIRMATION) {
                 throw ValidationException::withMessages([
-                    'status' => 'Only pending WhatsApp orders can be cancelled.',
+                    'status' => 'Only pending orders can be cancelled.',
                 ]);
             }
 

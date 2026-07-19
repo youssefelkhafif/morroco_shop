@@ -21,6 +21,17 @@ class AccountController extends Controller
         return Inertia::render('shop/account/settings');
     }
 
+    public function markAllAsRead()
+    {
+        $user = auth()->user();
+
+        if ($user) {
+            $user->unreadNotifications->markAsRead();
+        }
+
+        return back();
+    }
+
     public function updateProfile(Request $request)
     {
         $validated = $request->validate([

@@ -7,11 +7,16 @@ const formatMad = (value) =>
         minimumFractionDigits: 2,
     }).format(Number(value));
 
-const formatStatus = (status) =>
-    status
+const formatStatus = (status) => {
+    if (status === 'pending_whatsapp_confirmation') {
+        return 'Pending confirmation';
+    }
+
+    return status
         .split('_')
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(' ');
+};
 
 const statusClass = (status) => {
     if (status === 'confirmed' || status === 'delivered') {
@@ -52,8 +57,7 @@ export default function OrdersIndex({ orders }) {
                         </h1>
 
                         <p className="mt-2 text-sm text-muted-foreground">
-                            Review customer orders and confirm stock only after
-                            WhatsApp confirmation.
+                            Review customer orders and confirm stock only after admin approval.
                         </p>
                     </div>
 

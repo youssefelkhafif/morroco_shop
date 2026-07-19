@@ -4,6 +4,8 @@ import { useAppearance } from '@/hooks/use-appearance';
 
 const publicLinks = [
     { label: 'Shop', href: '/' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
     { label: 'Cart', href: '/cart' },
     { label: 'Track Order', href: '/track-order' },
 ];
@@ -24,7 +26,7 @@ export default function AppSidebar() {
     return (
         <aside className="flex min-h-screen w-64 flex-col border-r border-border bg-background p-5 text-foreground">
             <Link href="/" className="mb-10 text-xl font-black tracking-tight">
-                Morocco Shop
+                Streetwear Cap
             </Link>
 
             <nav className="space-y-1">

@@ -16,6 +16,7 @@ use App\Http\Controllers\Shop\AccountController;
 Route::middleware(['auth', 'verified'])->prefix('')->group(function () {
     // Account & Notifications
     Route::get('/notification', [AccountController::class, 'index'])->name('notification');
+    Route::post('/notification/mark-all-read', [AccountController::class, 'markAllAsRead'])->name('notification.markAllRead');
 
     // Settings
     Route::get('/settings', [AccountController::class, 'settings'])->name('settings');
