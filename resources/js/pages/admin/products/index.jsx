@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import AdminSidebar from '@/components/admin/admin-sidebar';
+import AdminLayout from '@/layouts/admin-layout';
 
 const formatMad = (amount) => `${Number(amount).toFixed(2)} MAD`;
 
@@ -221,10 +221,10 @@ export default function ProductsIndex({ products }) {
                         )}
                         </div>
                     </main>
-
-                    <AdminSidebar currentPath="/admin/products" />
                 </div>
             </div>
         </>
     );
 }
+
+ProductsIndex.layout = (page) => <AdminLayout>{page}</AdminLayout>;

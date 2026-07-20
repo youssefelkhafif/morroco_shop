@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import AdminSidebar from '@/components/admin/admin-sidebar';
+import AdminLayout from '@/layouts/admin-layout';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -182,10 +182,10 @@ export default function DeliveryZonesIndex({ deliveryZones }) {
                     </section>
                         </div>
                     </main>
-
-                    <AdminSidebar currentPath="/admin/delivery-zones" />
                 </div>
             </div>
         </>
     );
 }
+
+DeliveryZonesIndex.layout = (page) => <AdminLayout>{page}</AdminLayout>;

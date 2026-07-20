@@ -115,3 +115,7 @@ Route::middleware(['auth', 'admin'])
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/settings.php';
+
+Route::fallback(function () {
+    return inertia('shop/not-found');
+});

@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import AdminSidebar from '@/components/admin/admin-sidebar';
+import AdminLayout from '@/layouts/admin-layout';
 
 const notifications = [
     {
@@ -119,8 +119,6 @@ export default function AdminDashboard() {
                             </section>
                         </div>
                     </main>
-
-                    <AdminSidebar currentPath="/admin" />
                 </div>
             </div>
 
@@ -173,3 +171,5 @@ export default function AdminDashboard() {
         </>
     );
 }
+
+AdminDashboard.layout = (page) => <AdminLayout>{page}</AdminLayout>;

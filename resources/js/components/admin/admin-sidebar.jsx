@@ -12,14 +12,18 @@ const navigation = [
     { label: 'Delivery zones', href: '/admin/delivery-zones' },
 ];
 
-export default function AdminSidebar({ currentPath = '/admin' }) {
+export default function AdminSidebar({ currentPath = '/admin', variant = 'sidebar' }) {
     const { resolvedAppearance, updateAppearance } = useAppearance();
     const activePath = currentPath || '/admin';
     const nextAppearance = resolvedAppearance === 'dark' ? 'light' : 'dark';
     const ThemeIcon = resolvedAppearance === 'dark' ? Sun : Moon;
+    const panelClassName =
+        variant === 'drawer'
+            ? 'flex h-full flex-col border-r border-border bg-card/70 p-6 text-card-foreground shadow-sm'
+            : 'hidden w-72 shrink-0 flex-col border-l border-border bg-card/70 p-6 text-card-foreground shadow-sm lg:flex';
 
     return (
-        <aside className="hidden w-72 shrink-0 flex-col border-l border-border bg-card/70 p-6 text-card-foreground shadow-sm lg:flex">
+        <aside className={panelClassName}>
             <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     Streetwear Cap
