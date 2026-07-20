@@ -1,6 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import AdminSidebar from '@/components/admin/admin-sidebar';
+import AdminLayout from '@/layouts/admin-layout';
 import { Trash2 } from 'lucide-react';
 
 export default function CollectionsIndex({ collections }) {
@@ -29,8 +29,6 @@ export default function CollectionsIndex({ collections }) {
 
             <div className="min-h-screen bg-background text-foreground">
                 <div className="flex min-h-screen flex-col lg:flex-row">
-                    <AdminSidebar />
-
                     <main className="flex-1 p-6">
                         <div className="mx-auto max-w-6xl">
                             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
@@ -180,3 +178,5 @@ export default function CollectionsIndex({ collections }) {
         </>
     );
 }
+
+CollectionsIndex.layout = (page) => <AdminLayout>{page}</AdminLayout>;

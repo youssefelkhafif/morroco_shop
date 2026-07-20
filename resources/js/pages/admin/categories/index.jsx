@@ -1,6 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import AdminSidebar from '@/components/admin/admin-sidebar';
+import AdminLayout from '@/layouts/admin-layout';
 
 export default function CategoriesIndex({ categories }) {
     const { errors } = usePage().props;
@@ -209,10 +209,10 @@ export default function CategoriesIndex({ categories }) {
                         )}
                         </div>
                     </main>
-
-                    <AdminSidebar currentPath="/admin/categories" />
                 </div>
             </div>
         </>
     );
 }
+
+CategoriesIndex.layout = (page) => <AdminLayout>{page}</AdminLayout>;

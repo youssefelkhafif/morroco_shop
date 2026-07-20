@@ -18,9 +18,26 @@ class OrderController extends Controller
     {
         Gate::authorize('viewAny', Order::class);
 
-        $orders = Order::query()
+        $status = request()->query('status');
+        $search = trim((string) request()->query('search'));
+
+        $ordersQuery = Order::query()
             ->withCount('items')
-            ->latest()
+            ->latest();
+
+        if (in_array($status, ['pending_whatsapp_confirmation', 'confirmed', 'preparing', 'shipped', 'delivered'], true)) {
+            $ordersQuery->where('status', $status);
+        }
+
+        if ($search !== '') {
+            $ordersQuery->where(function ($query) use ($search) {
+                $query->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
+                    ->orWhere('customer_phone', 'like', "%{$search}%");
+            });
+        }
+
+        $orders = $ordersQuery
             ->paginate(20)
             ->through(fn(Order $order) => [
                 'id' => $order->id,
@@ -38,6 +55,7 @@ class OrderController extends Controller
 
         return Inertia::render('admin/orders/index', [
             'orders' => $orders,
+            'status' => $status,
         ]);
     }
 

@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import AdminSidebar from '@/components/admin/admin-sidebar';
+import AdminLayout from '@/layouts/admin-layout';
 
 const accentOptions = [
     { label: 'Black to Zinc', value: 'from-black to-zinc-700' },
@@ -31,8 +31,6 @@ export default function EditTheme({ theme }) {
 
             <div className="min-h-screen bg-background text-foreground">
                 <div className="flex min-h-screen flex-col lg:flex-row">
-                    <AdminSidebar />
-
                     <main className="flex-1 p-6">
                         <div className="mx-auto max-w-2xl">
                             <div className="mb-8">
@@ -174,3 +172,5 @@ export default function EditTheme({ theme }) {
         </>
     );
 }
+
+EditTheme.layout = (page) => <AdminLayout>{page}</AdminLayout>;

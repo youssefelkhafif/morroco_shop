@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import AdminLayout from '@/layouts/admin-layout';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -19,10 +20,9 @@ const formatStatus = (status) => {
 };
 
 export default function ShowOrder({ order }) {
-    const isPending =
-        order.status === 'pending_whatsapp_confirmation';
-    const isConfirmed = order.status === 'confirmed';
-    const isPreparing = order.status === 'preparing';
+    const isPending = order.status === 'pending_whatsapp_confirmation';
+    const canShip =
+        order.status === 'confirmed' || order.status === 'preparing';
     const isShipped = order.status === 'shipped';
 
     function confirmOrder() {
@@ -36,34 +36,6 @@ export default function ShowOrder({ order }) {
 
         router.post(
             `/admin/orders/${order.id}/confirm`,
-            {},
-            {
-                preserveScroll: true,
-            },
-        );
-    }
-
-    function cancelOrder() {
-        const confirmed = window.confirm(
-            'Cancel this order? This will stop the pending order.',
-        );
-
-        if (!confirmed) {
-            return;
-        }
-
-        router.post(
-            `/admin/orders/${order.id}/cancel`,
-            {},
-            {
-                preserveScroll: true,
-            },
-        );
-    }
-
-    function markPreparing() {
-        router.post(
-            `/admin/orders/${order.id}/prepare`,
             {},
             {
                 preserveScroll: true,
@@ -110,8 +82,10 @@ export default function ShowOrder({ order }) {
         <>
             <Head title={order.order_number} />
 
-            <main className="min-h-screen bg-background p-6 text-foreground">
-                <div className="mx-auto max-w-6xl">
+            <div className="min-h-screen bg-background text-foreground">
+                <div className="flex min-h-screen flex-col lg:flex-row">
+                    <main className="flex-1 p-6">
+                        <div className="mx-auto max-w-6xl">
                     <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <Link
@@ -146,42 +120,22 @@ export default function ShowOrder({ order }) {
                             </a>
 
                             {isPending && (
-                                <>
-                                    <button
-                                        type="button"
-                                        onClick={confirmOrder}
-                                        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-                                    >
-                                        Confirm order
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        onClick={cancelOrder}
-                                        className="rounded-lg border border-destructive/40 bg-background px-4 py-2 text-sm font-semibold text-destructive transition hover:bg-destructive/10"
-                                    >
-                                        Cancel order
-                                    </button>
-                                </>
-                            )}
-
-                            {isConfirmed && (
                                 <button
                                     type="button"
-                                    onClick={markPreparing}
-                                    className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                                    onClick={confirmOrder}
+                                    className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
                                 >
-                                    Mark preparing
+                                    Confirm order
                                 </button>
                             )}
 
-                            {isPreparing && (
+                            {canShip && (
                                 <button
                                     type="button"
                                     onClick={markShipped}
                                     className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
                                 >
-                                    Mark shipped
+                                    Ship order
                                 </button>
                             )}
 
@@ -191,7 +145,7 @@ export default function ShowOrder({ order }) {
                                     onClick={markDelivered}
                                     className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
                                 >
-                                    Mark delivered
+                                    Delivered
                                 </button>
                             )}
                         </div>
@@ -436,6 +390,10 @@ export default function ShowOrder({ order }) {
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
         </>
     );
 }
+
+ShowOrder.layout = (page) => <AdminLayout>{page}</AdminLayout>;

@@ -272,9 +272,9 @@ class OrderService
                 ->lockForUpdate()
                 ->findOrFail($order->id);
 
-            if ($order->status !== Order::STATUS_PREPARING) {
+            if (! in_array($order->status, [Order::STATUS_CONFIRMED, Order::STATUS_PREPARING], true)) {
                 throw ValidationException::withMessages([
-                    'status' => 'Only preparing orders can be marked as shipped.',
+                    'status' => 'Only confirmed or preparing orders can be marked as shipped.',
                 ]);
             }
 

@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import AdminSidebar from '@/components/admin/admin-sidebar';
+import AdminLayout from '@/layouts/admin-layout';
 
 export default function CreateCollection() {
     const { data, setData, post, processing, errors } = useForm({
@@ -23,8 +23,6 @@ export default function CreateCollection() {
 
             <div className="min-h-screen bg-background text-foreground">
                 <div className="flex min-h-screen flex-col lg:flex-row">
-                    <AdminSidebar />
-
                     <main className="flex-1 p-6">
                         <div className="mx-auto max-w-2xl">
                             <div className="mb-8">
@@ -174,3 +172,5 @@ export default function CreateCollection() {
         </>
     );
 }
+
+CreateCollection.layout = (page) => <AdminLayout>{page}</AdminLayout>;
