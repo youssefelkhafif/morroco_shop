@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Category;
+use App\Models\Collection;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\ProductImageService;
@@ -48,12 +49,17 @@ class ProductController extends Controller
     {
         return Inertia::render('admin/products/create', [
             'categories' => $this->categoriesForForm(),
+            'collections' => $this->collectionsForForm(),
         ]);
     }
 
     public function store(StoreProductRequest $request): RedirectResponse
     {
-        Product::create($request->validated());
+        $product = Product::create($request->validated());
+
+        if (! empty($colors = $request->validated()['colors'] ?? [])) {
+            $this->syncProductColors($product, $colors);
+        }
 
         return to_route('admin.products.index')
             ->with('success', 'Product created successfully.');
@@ -61,7 +67,7 @@ class ProductController extends Controller
 
     public function edit(Product $product): Response
     {
-        $product->load('images');
+        $product->load(['images', 'colors']);
 
         return Inertia::render('admin/products/edit', [
             'product' => [
@@ -69,6 +75,7 @@ class ProductController extends Controller
                 'category_id' => $product->category_id,
                 'name' => $product->name,
                 'slug' => $product->slug,
+                'collection_id' => $product->collection_id,
                 'description' => $product->description,
                 'price_mad' => $product->price_mad,
                 'old_price_mad' => $product->old_price_mad,
@@ -83,8 +90,18 @@ class ProductController extends Controller
                     ])
                     ->values()
                     ->all(),
+                'colors' => $product->colors
+                    ->map(fn ($color) => [
+                        'id' => $color->id,
+                        'name' => $color->name,
+                        'hex_code' => $color->hex_code,
+                        'sort_order' => $color->sort_order,
+                    ])
+                    ->values()
+                    ->all(),
             ],
             'categories' => $this->categoriesForForm(),
+            'collections' => $this->collectionsForForm(),
         ]);
     }
 
@@ -94,8 +111,37 @@ class ProductController extends Controller
     ): RedirectResponse {
         $product->update($request->validated());
 
+        $this->syncProductColors($product, $request->validated()['colors'] ?? []);
+
         return to_route('admin.products.index')
             ->with('success', 'Product updated successfully.');
+    }
+
+    private function syncProductColors(Product $product, array $colors): void
+    {
+        $submittedIds = collect($colors)
+            ->pluck('id')
+            ->filter()
+            ->all();
+
+        $product->colors()
+            ->whereNotIn('id', $submittedIds)
+            ->delete();
+
+        foreach ($colors as $index => $color) {
+            $data = [
+                'name' => $color['name'],
+                'hex_code' => $color['hex_code'],
+                'sort_order' => $color['sort_order'] ?? $index,
+            ];
+
+            if (! empty($color['id'])) {
+                $product->colors()->where('id', $color['id'])->update($data);
+                continue;
+            }
+
+            $product->colors()->create($data);
+        }
     }
 
     public function destroy(
@@ -120,6 +166,20 @@ class ProductController extends Controller
                 'id' => $category->id,
                 'name' => $category->name,
                 'is_active' => $category->is_active,
+            ])
+            ->all();
+    }
+
+    private function collectionsForForm(): array
+    {
+        return Collection::query()
+            ->orderByDesc('is_active')
+            ->orderBy('title')
+            ->get(['id', 'title', 'is_active'])
+            ->map(fn(Collection $collection) => [
+                'id' => $collection->id,
+                'title' => $collection->title,
+                'is_active' => $collection->is_active,
             ])
             ->all();
     }
