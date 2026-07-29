@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,7 @@ class Product extends Model
 
     protected $fillable = [
         'category_id',
+        'collection_id',
         'name',
         'slug',
         'description',
@@ -39,9 +41,20 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function collection(): BelongsTo
+    {
+        return $this->belongsTo(Collection::class);
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)
+            ->orderBy('sort_order');
+    }
+
+    public function colors(): HasMany
+    {
+        return $this->hasMany(ProductColor::class)
             ->orderBy('sort_order');
     }
 

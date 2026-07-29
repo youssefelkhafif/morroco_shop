@@ -8,6 +8,8 @@
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.jsx'])
 
+        <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+
         @inertiaHead
     </head>
 

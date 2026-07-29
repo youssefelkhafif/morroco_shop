@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import ProductForm from '@/components/admin/product-form';
 import ProductImageManager from '@/components/admin/product-image-manager';
 
-export default function EditProduct({ product, categories }) {
+export default function EditProduct({ product, categories, collections }) {
     return (
         <>
             <Head title={`Edit ${product.name}`} />
@@ -30,6 +30,7 @@ export default function EditProduct({ product, categories }) {
                         <ProductForm
                             product={product}
                             categories={categories}
+                            collections={collections}
                         />
 
                         <ProductImageManager

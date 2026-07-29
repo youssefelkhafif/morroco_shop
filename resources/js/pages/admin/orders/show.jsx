@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import AdminLayout from '@/layouts/admin-layout';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -7,15 +8,22 @@ const formatMad = (value) =>
         minimumFractionDigits: 2,
     }).format(Number(value));
 
-const formatStatus = (status) =>
-    status
+const formatStatus = (status) => {
+    if (status === 'pending_whatsapp_confirmation') {
+        return 'Pending confirmation';
+    }
+
+    return status
         .split('_')
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(' ');
+};
 
 export default function ShowOrder({ order }) {
-    const isPending =
-        order.status === 'pending_whatsapp_confirmation';
+    const isPending = order.status === 'pending_whatsapp_confirmation';
+    const canShip =
+        order.status === 'confirmed' || order.status === 'preparing';
+    const isShipped = order.status === 'shipped';
 
     function confirmOrder() {
         const confirmed = window.confirm(
@@ -35,12 +43,49 @@ export default function ShowOrder({ order }) {
         );
     }
 
+    function markShipped() {
+        router.post(
+            `/admin/orders/${order.id}/ship`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function markDelivered() {
+        router.post(
+            `/admin/orders/${order.id}/deliver`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function submitCarrierTracking(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+        const payload = Object.fromEntries(formData.entries());
+
+        router.post(
+            `/admin/orders/${order.id}/carrier-tracking`,
+            payload,
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+
     return (
         <>
             <Head title={order.order_number} />
 
-            <main className="min-h-screen bg-background p-6 text-foreground">
-                <div className="mx-auto max-w-6xl">
+            <div className="min-h-screen bg-background text-foreground">
+                <div className="flex min-h-screen flex-col lg:flex-row">
+                    <main className="flex-1 p-6">
+                        <div className="mx-auto max-w-6xl">
                     <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <Link
@@ -81,6 +126,26 @@ export default function ShowOrder({ order }) {
                                     className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
                                 >
                                     Confirm order
+                                </button>
+                            )}
+
+                            {canShip && (
+                                <button
+                                    type="button"
+                                    onClick={markShipped}
+                                    className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                                >
+                                    Ship order
+                                </button>
+                            )}
+
+                            {isShipped && (
+                                <button
+                                    type="button"
+                                    onClick={markDelivered}
+                                    className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                                >
+                                    Delivered
                                 </button>
                             )}
                         </div>
@@ -215,6 +280,48 @@ export default function ShowOrder({ order }) {
                         <aside className="space-y-6">
                             <section className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
                                 <h2 className="text-lg font-semibold">
+                                    Shipping details
+                                </h2>
+
+                                <form
+                                    className="mt-5 space-y-3"
+                                    onSubmit={submitCarrierTracking}
+                                >
+                                    <div>
+                                        <label className="text-sm font-medium text-muted-foreground">
+                                            Carrier
+                                        </label>
+                                        <input
+                                            name="carrier_name"
+                                            defaultValue={order.carrier_name ?? ''}
+                                            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                                            placeholder="Aramex"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-sm font-medium text-muted-foreground">
+                                            Tracking number
+                                        </label>
+                                        <input
+                                            name="tracking_number"
+                                            defaultValue={order.tracking_number ?? ''}
+                                            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                                            placeholder="TRK-123456"
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-semibold transition hover:bg-muted"
+                                    >
+                                        Save tracking
+                                    </button>
+                                </form>
+                            </section>
+
+                            <section className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+                                <h2 className="text-lg font-semibold">
                                     Cash on delivery
                                 </h2>
 
@@ -283,6 +390,10 @@ export default function ShowOrder({ order }) {
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
         </>
     );
 }
+
+ShowOrder.layout = (page) => <AdminLayout>{page}</AdminLayout>;

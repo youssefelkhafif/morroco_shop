@@ -6,6 +6,7 @@ use App\Models\DeliveryZone;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Notifications\OrderConfirmedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -69,6 +70,8 @@ class OrderService
                     'product_id' => $product->id,
                     'product_name' => $product->name,
                     'product_slug' => $product->slug,
+                    'product_color_id' => $item['color_id'] ?? null,
+                    'product_color_name' => $item['color_name'] ?? null,
                     'unit_price_mad' => $this->centsToMoney($unitPriceCents),
                     'quantity' => $item['quantity'],
                     'line_total_mad' => $this->centsToMoney($lineTotalCents),
@@ -120,9 +123,9 @@ class OrderService
         });
     }
 
-    public function confirm(Order $order): Order
+    public function confirm(Order $order, ?User $admin = null): Order
     {
-        return DB::transaction(function () use ($order) {
+        return DB::transaction(function () use ($order, $admin) {
             $order = Order::query()
                 ->with('items')
                 ->lockForUpdate()
@@ -141,7 +144,7 @@ class OrderService
                 !== Order::STATUS_PENDING_WHATSAPP_CONFIRMATION
             ) {
                 throw ValidationException::withMessages([
-                    'status' => 'Only pending WhatsApp orders can be confirmed.',
+                    'status' => 'Only pending orders can be confirmed.',
                 ]);
             }
 
@@ -187,7 +190,146 @@ class OrderService
             $order->forceFill([
                 'status' => Order::STATUS_CONFIRMED,
                 'confirmed_at' => now(),
+                'confirmed_by' => $admin?->id,
                 'stock_deducted_at' => now(),
+            ])->save();
+
+            $order->customer?->notify(new OrderConfirmedNotification($order));
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function cancel(Order $order, ?User $admin = null): Order
+    {
+        return DB::transaction(function () use ($order, $admin) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            if ($order->hasStockBeenDeducted()) {
+                return $order->fresh([
+                    'items',
+                    'deliveryZone',
+                    'customer',
+                ]);
+            }
+
+            if ($order->status !== Order::STATUS_PENDING_WHATSAPP_CONFIRMATION) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only pending orders can be cancelled.',
+                ]);
+            }
+
+            $order->forceFill([
+                'status' => Order::STATUS_CANCELLED,
+                'cancelled_at' => now(),
+                'cancelled_by' => $admin?->id,
+            ])->save();
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function markPreparing(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            if ($order->status !== Order::STATUS_CONFIRMED) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only confirmed orders can be marked as preparing.',
+                ]);
+            }
+
+            $order->forceFill([
+                'status' => Order::STATUS_PREPARING,
+                'preparing_at' => now(),
+            ])->save();
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function markShipped(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            if (! in_array($order->status, [Order::STATUS_CONFIRMED, Order::STATUS_PREPARING], true)) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only confirmed or preparing orders can be marked as shipped.',
+                ]);
+            }
+
+            $order->forceFill([
+                'status' => Order::STATUS_SHIPPED,
+                'shipped_at' => now(),
+            ])->save();
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function markDelivered(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            if ($order->status !== Order::STATUS_SHIPPED) {
+                throw ValidationException::withMessages([
+                    'status' => 'Only shipped orders can be marked as delivered.',
+                ]);
+            }
+
+            $order->forceFill([
+                'status' => Order::STATUS_DELIVERED,
+                'delivered_at' => now(),
+            ])->save();
+
+            return $order->fresh([
+                'items',
+                'deliveryZone',
+                'customer',
+            ]);
+        });
+    }
+
+    public function assignCarrierAndTracking(
+        Order $order,
+        string $carrierName,
+        string $trackingNumber,
+    ): Order {
+        return DB::transaction(function () use ($order, $carrierName, $trackingNumber) {
+            $order = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            $order->forceFill([
+                'carrier_name' => trim($carrierName),
+                'tracking_number' => trim($trackingNumber),
             ])->save();
 
             return $order->fresh([
@@ -206,7 +348,7 @@ class OrderService
             ]);
         }
 
-        $quantities = [];
+        $normalized = [];
 
         foreach (array_values($items) as $index => $item) {
             $productId = filter_var(
@@ -221,25 +363,33 @@ class OrderService
                 ['options' => ['min_range' => 1]],
             );
 
+            $colorId = isset($item['color_id'])
+                ? filter_var(
+                    $item['color_id'],
+                    FILTER_VALIDATE_INT,
+                    ['options' => ['min_range' => 1]],
+                )
+                : null;
+
+            $colorName = isset($item['color_name'])
+                ? trim((string) $item['color_name'])
+                : null;
+
             if ($productId === false || $quantity === false) {
                 throw ValidationException::withMessages([
                     "items.{$index}" => 'Each item needs a valid product and quantity.',
                 ]);
             }
 
-            $quantities[$productId] = ($quantities[$productId] ?? 0)
-                + $quantity;
+            $normalized[$productId] = [
+                'product_id' => $productId,
+                'quantity' => $quantity,
+                'color_id' => $colorId,
+                'color_name' => $colorName,
+            ];
         }
 
-        return collect($quantities)
-            ->map(
-                fn (int $quantity, int $productId) => [
-                    'product_id' => $productId,
-                    'quantity' => $quantity,
-                ],
-            )
-            ->values()
-            ->all();
+        return array_values($normalized);
     }
 
     private function generateOrderNumber(): string

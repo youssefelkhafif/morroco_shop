@@ -18,6 +18,7 @@ class UpdateProductRequest extends FormRequest
         $this->merge([
             'is_active' => $this->boolean('is_active'),
             'is_featured' => $this->boolean('is_featured'),
+            'collection_id' => $this->input('collection_id') ?: null,
         ]);
     }
 
@@ -34,6 +35,11 @@ class UpdateProductRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::exists('categories', 'id'),
+            ],
+            'collection_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('collections', 'id'),
             ],
             'name' => [
                 'required',
@@ -74,6 +80,32 @@ class UpdateProductRequest extends FormRequest
             'is_featured' => [
                 'required',
                 'boolean',
+            ],
+            'colors' => [
+                'nullable',
+                'array',
+            ],
+            'colors.*.id' => [
+                'nullable',
+                'integer',
+                Rule::exists('product_colors', 'id')->where(
+                    fn ($query) => $query->where('product_id', $productId),
+                ),
+            ],
+            'colors.*.name' => [
+                'required',
+                'string',
+                'max:120',
+            ],
+            'colors.*.hex_code' => [
+                'required',
+                'string',
+                'regex:/^#([0-9a-fA-F]{3}){1,2}$/',
+            ],
+            'colors.*.sort_order' => [
+                'nullable',
+                'integer',
+                'min:0',
             ],
         ];
     }
