@@ -277,7 +277,7 @@
                 </tr>
 
                 <tr class="cod-row">
-                    <td>COD amount to collect</td>
+                    <td>Cash on Delivery total to collect</td>
                     <td class="text-right">
                         MAD {{ number_format((float) $order->cod_amount_mad, 2) }}
                     </td>

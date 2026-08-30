@@ -1,21 +1,15 @@
 import { useHttp } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
-import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
 
+const createRoute = (url, method) => ({
+  url,
+  method,
+  form: () => ({ action: url, method }),
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+const qrCode = () => createRoute('/user/two-factor-qr-code', 'get');
+const secretKey = () => createRoute('/user/two-factor-secret-key', 'get');
+const recoveryCodes = () => createRoute('/user/two-factor-recovery-codes', 'get');
 
 export const OTP_MAX_LENGTH = 6;
 

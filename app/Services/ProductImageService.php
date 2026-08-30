@@ -42,7 +42,7 @@ class ProductImageService
 
                 foreach ($uploadedImages as $uploadedImage) {
                     $path = $uploadedImage->store(
-                        "products/{$product->id}",
+                        (string) $product->id,
                         self::DISK,
                     );
 
@@ -67,7 +67,7 @@ class ProductImageService
 
     public function delete(ProductImage $image): void
     {
-        $path = $image->path;
+        $path = $this->normalizePath((string) $image->path);
 
         $image->delete();
 
@@ -83,7 +83,12 @@ class ProductImageService
         }
 
         Storage::disk(self::DISK)->deleteDirectory(
-            "products/{$product->id}",
+            (string) $product->id,
         );
+    }
+
+    private function normalizePath(string $path): string
+    {
+        return ltrim((string) preg_replace('#^products/#', '', $path), '/');
     }
 }

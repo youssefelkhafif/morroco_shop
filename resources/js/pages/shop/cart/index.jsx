@@ -1,5 +1,7 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import ShopNavigation from '@/components/shop-navigation';
+import { useAppContext } from '@/context/appContext';
+import { resolveTranslation } from '@/lib/translations';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -9,6 +11,8 @@ const formatMad = (value) =>
     }).format(Number(value));
 
 export default function CartIndex({ cart }) {
+    const { selectedLanguage } = useAppContext();
+    const t = (key, fallback = key) => resolveTranslation(selectedLanguage, key, fallback);
     const { errors } = usePage().props;
 
     function decreaseQuantity(item) {
@@ -56,16 +60,15 @@ export default function CartIndex({ cart }) {
                             href="/"
                             className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                         >
-                            ← Continue shopping
+                            ← {t('nav.continueShopping')}
                         </Link>
 
                         <h1 className="mt-3 text-3xl font-bold">
-                            Your cart
+                            {t('cart.title')}
                         </h1>
 
                         <p className="mt-2 text-sm text-muted-foreground">
-                            Prices and stock are verified by Morocco Shop before
-                            an order is created.
+                            {t('cart.subtitle')}
                         </p>
                     </div>
 
@@ -78,18 +81,18 @@ export default function CartIndex({ cart }) {
                     {cart.items.length === 0 ? (
                         <section className="rounded-xl border border-border bg-card p-8 text-center text-card-foreground shadow-sm">
                             <h2 className="text-lg font-semibold">
-                                Your cart is empty
+                                {t('cart.emptyTitle')}
                             </h2>
 
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Add products from the shop to start an order.
+                                {t('cart.emptyCopy')}
                             </p>
 
                             <Link
                                 href="/"
                                 className="mt-5 inline-flex rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
                             >
-                                Browse products
+                                {t('nav.browseProducts')}
                             </Link>
                         </section>
                     ) : (
@@ -171,7 +174,7 @@ export default function CartIndex({ cart }) {
                                                         }
                                                         className="text-sm font-medium text-destructive hover:underline"
                                                     >
-                                                        Remove
+                                                        {t('cart.remove')}
                                                     </button>
                                                 </div>
                                             </div>
@@ -182,12 +185,12 @@ export default function CartIndex({ cart }) {
 
                             <aside className="h-fit rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
                                 <h2 className="text-lg font-semibold">
-                                    Cart summary
+                                    {t('cart.cartSummary')}
                                 </h2>
 
                                 <div className="mt-5 flex justify-between gap-4 text-sm">
                                     <span className="text-muted-foreground">
-                                        Items ({cart.item_count})
+                                        {t('cart.items')} ({cart.item_count})
                                     </span>
 
                                     <span className="font-semibold">
@@ -197,7 +200,7 @@ export default function CartIndex({ cart }) {
 
                                 <div className="mt-5 border-t border-border pt-5">
                                     <div className="flex justify-between gap-4 text-base font-bold">
-                                        <span>Products subtotal</span>
+                                        <span>{t('cart.productsSubtotal')}</span>
 
                                         <span>
                                             {formatMad(cart.subtotal_mad)}
@@ -205,8 +208,7 @@ export default function CartIndex({ cart }) {
                                     </div>
 
                                     <p className="mt-3 text-xs text-muted-foreground">
-                                        Delivery fee is calculated after the
-                                        customer selects a delivery zone.
+                                        {t('cart.deliveryFeeNote')}
                                     </p>
                                 </div>
 
@@ -214,7 +216,7 @@ export default function CartIndex({ cart }) {
                                     href="/checkout"
                                     className="mt-6 flex w-full justify-center rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
                                 >
-                                    Continue to checkout
+                                    {t('cart.continueToCheckout')}
                                 </Link>
                             </aside>
                         </div>

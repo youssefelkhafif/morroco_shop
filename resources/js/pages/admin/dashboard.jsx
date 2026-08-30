@@ -1,5 +1,19 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    Legend,
+    Line,
+    Pie,
+    PieChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from 'recharts';
 import AdminLayout from '@/layouts/admin-layout';
 
 const notifications = [
@@ -20,8 +34,40 @@ const notifications = [
     },
 ];
 
-export default function AdminDashboard() {
+const formatMad = (value) =>
+    new Intl.NumberFormat('en-MA', {
+        style: 'currency',
+        currency: 'MAD',
+        minimumFractionDigits: 2,
+    }).format(Number(value || 0));
+
+export default function AdminDashboard({ stats = {}, sales_trend = [], category_distribution = [] }) {
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+    const stockRemaining = Number(stats.stock_remaining || 0);
+    const lowStockCount = Number(stats.low_stock_count || 0);
+    const totalOrders = Number(stats.total_orders || 0);
+    const completedOrders = Number(stats.completed_orders || 0);
+    const totalCustomers = Number(stats.total_customers || 0);
+    const activeCategories = Number(stats.active_categories || 0);
+    const activeProducts = Number(stats.active_products || 0);
+    const salesVolume = Number(stats.sales_volume || 0);
+
+    const trendData = Array.isArray(sales_trend) && sales_trend.length
+        ? sales_trend.map((entry) => ({
+            month: entry.month,
+            sales: Number(entry.sales || 0),
+            orders: Number(entry.orders || 0),
+        }))
+        : [];
+
+    const categoryData = Array.isArray(category_distribution) && category_distribution.length
+        ? category_distribution.map((entry) => ({
+            name: entry.name,
+            value: Number(entry.value || 0),
+            color: entry.color || '#8b5cf6',
+        }))
+        : [];
 
     return (
         <>
@@ -65,57 +111,177 @@ export default function AdminDashboard() {
                             </div>
 
                             <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        <article className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
-                            <h2 className="text-lg font-semibold">
-                                Categories
-                            </h2>
+                                <article className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                                            Inventory
+                                        </p>
+                                        <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600">
+                                            Active stock
+                                        </span>
+                                    </div>
 
-                            <p className="mt-2 text-sm text-muted-foreground">
-                                Organize the shop catalog before assigning products.
-                            </p>
+                                    <p className="mt-5 text-3xl font-bold tracking-tight">
+                                        {stockRemaining}
+                                    </p>
+                                    <p className="mt-2 text-sm text-muted-foreground">
+                                        Total units remaining across active products.
+                                    </p>
 
-                            <Link
-                                href="/admin/categories"
-                                className="mt-5 inline-flex rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-                            >
-                                Manage categories
-                            </Link>
-                        </article>
+                                    <div className="mt-5 rounded-lg bg-muted/60 p-3 text-sm">
+                                        <span className="font-semibold text-foreground">
+                                            {lowStockCount}
+                                        </span>
+                                        {' '}
+                                        products are low on stock.
+                                    </div>
+                                </article>
 
-                        <article className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
-                            <h2 className="text-lg font-semibold">
-                                Products
-                            </h2>
+                                <article className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                                            Sales
+                                        </p>
+                                        <span className="rounded-full bg-blue-500/10 px-2 py-1 text-xs font-semibold text-blue-600">
+                                            Orders
+                                        </span>
+                                    </div>
 
-                            <p className="mt-2 text-sm text-muted-foreground">
-                                Manage prices, stock, category, active status, and featured items.
-                            </p>
+                                    <p className="mt-5 text-3xl font-bold tracking-tight">
+                                        {totalOrders}
+                                    </p>
+                                    <p className="mt-2 text-sm text-muted-foreground">
+                                        {totalCustomers} customers have purchased from the store.
+                                    </p>
 
-                            <Link
-                                href="/admin/products"
-                                className="mt-5 inline-flex rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-                            >
-                                Manage products
-                            </Link>
-                        </article>
+                                    <div className="mt-5 rounded-lg bg-muted/60 p-3 text-sm">
+                                        <span className="font-semibold text-foreground">
+                                            {completedOrders}
+                                        </span>
+                                        {' '}
+                                        completed orders.
+                                    </div>
+                                </article>
 
-                        <article className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
-                            <h2 className="text-lg font-semibold">
-                                Orders
-                            </h2>
+                                <article className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm md:col-span-2 xl:col-span-1">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                                            Catalog
+                                        </p>
+                                        <span className="rounded-full bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-600">
+                                            Overview
+                                        </span>
+                                    </div>
 
-                            <p className="mt-2 text-sm text-muted-foreground">
-                                Review incoming orders, confirm pending orders, and cancel them when needed.
-                            </p>
+                                    <div className="mt-5 space-y-3 text-sm">
+                                        <div className="flex items-center justify-between rounded-lg bg-muted/60 p-3">
+                                            <span className="text-muted-foreground">Active categories</span>
+                                            <span className="font-semibold text-foreground">{activeCategories}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between rounded-lg bg-muted/60 p-3">
+                                            <span className="text-muted-foreground">Products</span>
+                                            <span className="font-semibold text-foreground">{activeProducts}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between rounded-lg bg-muted/60 p-3">
+                                            <span className="text-muted-foreground">Sales volume</span>
+                                            <span className="font-semibold text-foreground">{formatMad(salesVolume)}</span>
+                                        </div>
+                                    </div>
+                                </article>
+                            </section>
 
-                            <Link
-                                href="/admin/orders"
-                                className="mt-5 inline-flex rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-                            >
-                                Manage orders
-                            </Link>
-                        </article>
+                            <section className="mt-6 grid gap-4 xl:grid-cols-[1.7fr_0.9fr]">
+                                <article className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+                                    <div className="mb-5 flex items-center justify-between gap-3">
+                                        <div>
+                                            <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                                                Performance
+                                            </p>
+                                            <h2 className="mt-1 text-xl font-semibold text-foreground">
+                                                Sales & revenue trends
+                                            </h2>
+                                        </div>
+                                        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                                            MAD
+                                        </span>
+                                    </div>
 
+                                    <div className="h-80 w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={trendData}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.22)" vertical={false} />
+                                                <XAxis dataKey="month" stroke="#94a3b8" tickLine={false} axisLine={false} />
+                                                <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} />
+                                                <Tooltip
+                                                    contentStyle={{
+                                                        backgroundColor: '#111827',
+                                                        border: '1px solid rgba(148,163,184,0.2)',
+                                                        borderRadius: 12,
+                                                        color: '#f8fafc',
+                                                    }}
+                                                    formatter={(value, name) => [
+                                                        name === 'sales' ? formatMad(value) : `${value}`,
+                                                        name === 'sales' ? 'Revenue' : 'Orders',
+                                                    ]}
+                                                />
+                                                <Legend />
+                                                <Bar dataKey="sales" fill="#8b5cf6" radius={[6, 6, 0, 0]} name="Revenue" />
+                                                <Line type="monotone" dataKey="orders" stroke="#34d399" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Completed orders" />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </article>
+
+                                <article className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+                                    <div className="mb-5">
+                                        <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                                            Distribution
+                                        </p>
+                                        <h2 className="mt-1 text-xl font-semibold text-foreground">
+                                            Inventory mix
+                                        </h2>
+                                    </div>
+
+                                    <div className="h-72 w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={categoryData}
+                                                    dataKey="value"
+                                                    nameKey="name"
+                                                    innerRadius={52}
+                                                    outerRadius={86}
+                                                    paddingAngle={4}
+                                                >
+                                                    {categoryData.map((entry) => (
+                                                        <Cell key={entry.name} fill={entry.color} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip
+                                                    contentStyle={{
+                                                        backgroundColor: '#111827',
+                                                        border: '1px solid rgba(148,163,184,0.2)',
+                                                        borderRadius: 12,
+                                                        color: '#f8fafc',
+                                                    }}
+                                                    formatter={(value) => [`${value}%`, 'Share']}
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+
+                                    <div className="mt-3 space-y-2">
+                                        {categoryData.map((item) => (
+                                            <div key={item.name} className="flex items-center justify-between gap-3 text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                                                    <span className="text-muted-foreground">{item.name}</span>
+                                                </div>
+                                                <span className="font-semibold text-foreground">{item.value}%</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </article>
                             </section>
                         </div>
                     </main>

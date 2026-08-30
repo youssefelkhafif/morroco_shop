@@ -1,25 +1,29 @@
 import { Head, Link } from '@inertiajs/react';
 import ShopNavigation from '@/components/shop-navigation';
+import { useAppContext } from '@/context/appContext';
+import { resolveTranslation } from '@/lib/translations';
 
 export default function CollectionIndex({ collections, cart_item_count: cartItemCount }) {
+    const { selectedLanguage } = useAppContext();
+    const t = (key, fallback = key) => resolveTranslation(selectedLanguage, key, fallback);
     return (
         <>
-            <Head title="Collections | Streetwear Caps" />
+            <Head title={t('collections.title')} />
 
             <main className="min-h-screen bg-background text-foreground">
                 <ShopNavigation cartItemCount={cartItemCount} />
 
                 <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                     <div className="mb-8">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-muted-foreground">Collections</p>
-                        <h1 className="mt-3 text-4xl font-black sm:text-5xl">Curated product collections</h1>
-                        <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">Explore editorial drops and grouped products hand-picked for your everyday style.</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-muted-foreground">{t('collections.title')}</p>
+                        <h1 className="mt-3 text-4xl font-black sm:text-5xl">{t('collections.subtitle')}</h1>
+                        <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">{t('collections.collectionsCopy')}</p>
                     </div>
 
                     {collections.length === 0 ? (
                         <div className="rounded-[1.5rem] border border-dashed border-border bg-card p-10 text-center">
-                            <h2 className="text-lg font-bold">No collections yet</h2>
-                            <p className="mt-2 text-sm text-muted-foreground">Create a collection from the admin panel and assign products to it.</p>
+                            <h2 className="text-lg font-bold">{t('collections.emptyTitle')}</h2>
+                            <p className="mt-2 text-sm text-muted-foreground">{t('collections.emptyCopy')}</p>
                         </div>
                     ) : (
                         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -37,7 +41,7 @@ export default function CollectionIndex({ collections, cart_item_count: cartItem
                                         />
                                     ) : (
                                         <div className="flex h-64 items-center justify-center bg-muted text-muted-foreground">
-                                            No image available
+                                            {t('common.noImage')}
                                         </div>
                                     )}
 

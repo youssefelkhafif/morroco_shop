@@ -1,5 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import ShopNavigation from '@/components/shop-navigation';
+import { useAppContext } from '@/context/appContext';
+import { resolveTranslation } from '@/lib/translations';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -9,9 +11,11 @@ const formatMad = (value) =>
     }).format(Number(value));
 
 export default function CollectionShow({ collection, cart_item_count: cartItemCount }) {
+    const { selectedLanguage } = useAppContext();
+    const t = (key, fallback = key) => resolveTranslation(selectedLanguage, key, fallback);
     return (
         <>
-            <Head title={`${collection.title} | Streetwear Caps`} />
+            <Head title={t('collections.titleTemplate').replace('{name}', collection.title)} />
 
             <main className="min-h-screen bg-background text-foreground">
                 <ShopNavigation cartItemCount={cartItemCount} />
@@ -29,8 +33,8 @@ export default function CollectionShow({ collection, cart_item_count: cartItemCo
                 <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                     {collection.products.length === 0 ? (
                         <div className="rounded-[1.5rem] border border-dashed border-border bg-card p-10 text-center">
-                            <h2 className="text-lg font-bold">No products in this collection yet</h2>
-                            <p className="mt-2 text-sm text-muted-foreground">Assign products to this collection from the admin panel to display them here.</p>
+                            <h2 className="text-lg font-bold">{t('collections.noProductsTitle')}</h2>
+                            <p className="mt-2 text-sm text-muted-foreground">{t('collections.noProductsCopy')}</p>
                         </div>
                     ) : (
                         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -48,12 +52,12 @@ export default function CollectionShow({ collection, cart_item_count: cartItemCo
                                         />
                                     ) : (
                                         <div className="flex h-80 items-center justify-center bg-muted text-muted-foreground">
-                                            No image
+                                            {t('common.noImage')}
                                         </div>
                                     )}
 
                                     <div className="p-6">
-                                        <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">{product.category_name ?? 'Product'}</p>
+                                        <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">{product.category_name ?? t('collections.productFallbackCategory')}</p>
                                         <h2 className="mt-4 text-2xl font-black">{product.name}</h2>
                                         <p className="mt-4 text-lg font-semibold">{formatMad(product.price_mad)}</p>
                                     </div>

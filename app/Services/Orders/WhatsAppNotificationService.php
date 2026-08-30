@@ -33,7 +33,7 @@ class WhatsAppNotificationService
             'Products:',
             $items,
             '',
-            "COD total: MAD {$order->cod_amount_mad}",
+            "Cash on Delivery total: MAD {$order->cod_amount_mad}",
         ]);
 
         return 'https://wa.me/' . $whatsAppNumber . '?text=' . rawurlencode($message);

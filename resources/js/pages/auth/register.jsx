@@ -106,6 +106,10 @@ export default function Register() {
                                 className="w-full rounded-[1.5rem] border border-border bg-background px-4 py-3 text-foreground outline-none transition focus:border-foreground focus:ring-2 focus:ring-foreground/10"
                             />
 
+                            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                                Use at least 8 characters, one uppercase letter, and one symbol.
+                            </p>
+
                             {errors.password && (
                                 <p className="mt-2 text-sm font-medium text-destructive">
                                     {errors.password}

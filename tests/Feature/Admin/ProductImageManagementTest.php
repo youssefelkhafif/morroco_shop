@@ -39,7 +39,7 @@ test('an admin can upload product images and they keep sort order', function () 
     $existingImage = ProductImage::factory()
         ->for($product)
         ->create([
-            'path' => "products/{$product->id}/existing.jpg",
+            'path' => "{$product->id}/existing.jpg",
             'sort_order' => 0,
         ]);
 
@@ -63,6 +63,7 @@ test('an admin can upload product images and they keep sort order', function () 
     expect($images->pluck('sort_order')->all())->toBe([0, 1, 2]);
 
     foreach ($images as $image) {
+        expect($image->path)->toStartWith("{$product->id}/");
         Storage::disk(ProductImageService::DISK)->assertExists($image->path);
     }
 });
@@ -130,7 +131,7 @@ test('an admin can delete one product image and its physical file', function () 
     $image = ProductImage::factory()
         ->for($product)
         ->create([
-            'path' => "products/{$product->id}/remove-me.jpg",
+            'path' => "{$product->id}/remove-me.jpg",
         ]);
 
     Storage::disk(ProductImageService::DISK)->put(
@@ -179,7 +180,7 @@ test('deleting a product removes its image records and physical files', function
     $image = ProductImage::factory()
         ->for($product)
         ->create([
-            'path' => "products/{$product->id}/delete-with-product.jpg",
+            'path' => "{$product->id}/delete-with-product.jpg",
         ]);
 
     Storage::disk(ProductImageService::DISK)->put(

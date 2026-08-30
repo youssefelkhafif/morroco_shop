@@ -10,7 +10,12 @@ import {
   CardHeader,
   CardTitle } from
 '@/components/ui/card';
-import { regenerateRecoveryCodes } from '@/routes/two-factor';
+const regenerateRecoveryCodes = {
+  form: () => ({
+    action: '/user/two-factor-recovery-codes',
+    method: 'post',
+  }),
+};
 
 
 

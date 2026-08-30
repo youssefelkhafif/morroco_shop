@@ -151,7 +151,7 @@ export default function OrdersIndex({ orders, status }) {
                                                 Items
                                             </th>
                                             <th className="px-5 py-4 font-medium">
-                                                COD total
+                                                Cash on Delivery Total
                                             </th>
                                             <th className="px-5 py-4 font-medium">
                                                 Status

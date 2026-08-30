@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DeliveryZoneController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ThemeController;
 use App\Http\Controllers\Admin\CollectionController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\CollectionController as ShopCollectionController;
 use App\Http\Controllers\Shop\HomeController;
@@ -21,6 +22,15 @@ Route::get('/about', function () {
         'shop_instagram' => config('shop.instagram.handle'),
     ]);
 })->name('about');
+
+Route::get('/shipping-policy', function () {
+    return inertia('shop/shipping-policy');
+})->name('shipping-policy');
+
+Route::get('/privacy-policy', function () {
+    return inertia('shop/privacy-policy');
+})->name('privacy-policy');
+
 Route::get('/contact', function () {
     return inertia('shop/contact', [
         'contact_email' => config('shop.contact.email'),
@@ -62,7 +72,7 @@ Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->as('admin.')
     ->group(function () {
-        Route::inertia('/', 'admin/dashboard')->name('dashboard');
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('products', ProductController::class)->except('show');
         Route::post(

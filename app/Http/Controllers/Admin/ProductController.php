@@ -11,7 +11,6 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\ProductImageService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -85,7 +84,7 @@ class ProductController extends Controller
                 'images' => $product->images
                     ->map(fn(ProductImage $image) => [
                         'id' => $image->id,
-                        'url' => Storage::disk('public')->url($image->path),
+                        'url' => $image->url,
                         'sort_order' => $image->sort_order,
                     ])
                     ->values()

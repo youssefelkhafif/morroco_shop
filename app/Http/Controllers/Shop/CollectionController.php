@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Models\Collection;
 use App\Services\Shop\CartService;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -49,9 +48,7 @@ class CollectionController extends Controller
                     'old_price_mad' => $product->old_price_mad,
                     'stock_quantity' => $product->stock_quantity,
                     'is_featured' => $product->is_featured,
-                    'image_url' => $product->images->first()
-                        ? Storage::disk('public')->url($product->images->first()->path)
-                        : null,
+                    'image_url' => $product->images->first()?->url,
                 ])->all(),
             ],
             'cart_item_count' => $cartService->summary()['item_count'],

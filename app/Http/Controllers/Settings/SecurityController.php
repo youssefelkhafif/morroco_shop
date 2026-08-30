@@ -37,7 +37,7 @@ class SecurityController extends Controller
                     ->values()
                     ->all()
                 : [],
-            'passwordRules' => Password::defaults()->toPasswordRulesString(),
+            'passwordRules' => 'Minimum 8 characters, at least one uppercase letter, and at least one symbol.',
         ];
 
         if (Features::canManageTwoFactorAuthentication()) {

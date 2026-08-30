@@ -1,6 +1,9 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
+import ShopNavigation from '@/components/shop-navigation';
 import NotificationBell from '@/components/notification-bell';
+import { useAppContext } from '@/context/appContext';
+import { resolveTranslation } from '@/lib/translations';
 
 const formatMad = (value) =>
     new Intl.NumberFormat('en-MA', {
@@ -9,18 +12,119 @@ const formatMad = (value) =>
         minimumFractionDigits: 2,
     }).format(Number(value));
 
+function DeliveryDetailsSection({ form, deliveryZones, selectedZone, t }) {
+    return (
+        <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <h2 className="text-lg font-semibold">{t('checkout.deliveryInfo')}</h2>
+
+            <div className="mt-5 space-y-5">
+                <label className="block">
+                    <span className="text-sm font-medium">
+                        {t('checkout.deliveryZone')}{' '}
+                        <span className="text-destructive">*</span>
+                    </span>
+
+                    <select
+                        required
+                        value={form.data.delivery_zone_id}
+                        onChange={(event) =>
+                            form.setData('delivery_zone_id', event.target.value)
+                        }
+                        className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring"
+                    >
+                        <option value="">{t('checkout.selectCity')}</option>
+
+                        {deliveryZones.map((zone) => (
+                            <option key={zone.id} value={zone.id}>
+                                {zone.city} · {zone.district} · {zone.zone_name}{' '}
+                                — {formatMad(zone.delivery_fee_mad)}
+                            </option>
+                        ))}
+                    </select>
+
+                    {form.errors.delivery_zone_id && (
+                        <p className="mt-1 text-sm text-destructive">
+                            {form.errors.delivery_zone_id}
+                        </p>
+                    )}
+
+                    {selectedZone && (
+                        <p className="mt-2 text-sm text-muted-foreground">
+                            {selectedZone.estimated_delivery_days
+                                ? `${t('checkout.estimatedDelivery')}: ${selectedZone.estimated_delivery_days} day(s).`
+                                : t('checkout.estimatedDeliveryUnknown')}
+                        </p>
+                    )}
+                </label>
+
+                <label className="block">
+                    <span className="text-sm font-medium">
+                        {t('checkout.fullAddress')}{' '}
+                        <span className="text-destructive">*</span>
+                    </span>
+
+                    <textarea
+                        rows="4"
+                        required
+                        value={form.data.delivery_address}
+                        onChange={(event) =>
+                            form.setData('delivery_address', event.target.value)
+                        }
+                        className="mt-2 w-full resize-y rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring"
+                        placeholder={t('checkout.addressPlaceholder')}
+                        autoComplete="street-address"
+                    />
+
+                    {form.errors.delivery_address && (
+                        <p className="mt-1 text-sm text-destructive">
+                            {form.errors.delivery_address}
+                        </p>
+                    )}
+                </label>
+
+                <label className="block">
+                    <span className="text-sm font-medium">
+                        {t('checkout.deliveryNote')}
+                    </span>
+
+                    <textarea
+                        rows="3"
+                        value={form.data.customer_note}
+                        onChange={(event) =>
+                            form.setData('customer_note', event.target.value)
+                        }
+                        className="mt-2 w-full resize-y rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring"
+                        placeholder={t('checkout.notePlaceholder')}
+                    />
+
+                    {form.errors.customer_note && (
+                        <p className="mt-1 text-sm text-destructive">
+                            {form.errors.customer_note}
+                        </p>
+                    )}
+                </label>
+            </div>
+        </div>
+    );
+}
+
 export default function CheckoutIndex({
     cart,
     delivery_zones: deliveryZones,
+    cart_item_count: cartItemCount,
 }) {
     const {
         auth,
         orderPlaced: orderPlacedProp,
         orderNumber,
+        orderTotal,
     } = usePage().props;
+    const { selectedLanguage } = useAppContext();
+    const t = (key, fallback = key) => resolveTranslation(selectedLanguage, key, fallback);
     const [isOrderPlacedModalOpen, setIsOrderPlacedModalOpen] = useState(
         Boolean(orderPlacedProp),
     );
+    const [hasTrackedPurchase, setHasTrackedPurchase] = useState(false);
 
     const orderPlaced = Boolean(orderPlacedProp || isOrderPlacedModalOpen);
 
@@ -30,6 +134,33 @@ export default function CheckoutIndex({
         }
     }, [orderPlacedProp]);
 
+    useEffect(() => {
+        if (!orderPlaced || !orderNumber || !orderTotal || hasTrackedPurchase) {
+            return;
+        }
+
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const storageKey = `meta-pixel-purchase:${orderNumber}`;
+
+        if (window.sessionStorage.getItem(storageKey) === '1') {
+            setHasTrackedPurchase(true);
+            return;
+        }
+
+        if (typeof window.fbq === 'function') {
+            window.fbq('track', 'Purchase', {
+                value: Number(orderTotal),
+                currency: 'MAD',
+            });
+        }
+
+        window.sessionStorage.setItem(storageKey, '1');
+        setHasTrackedPurchase(true);
+    }, [hasTrackedPurchase, orderPlaced, orderNumber, orderTotal]);
+
     function closeModal() {
         setIsOrderPlacedModalOpen(false);
         router.visit('/', { preserveState: false });
@@ -38,7 +169,6 @@ export default function CheckoutIndex({
     const form = useForm({
         customer_name: '',
         customer_phone: '',
-        customer_email: '',
         delivery_zone_id: '',
         delivery_address: '',
         customer_note: '',
@@ -66,28 +196,26 @@ export default function CheckoutIndex({
         <>
             <Head title="Checkout" />
 
-            <main className="min-h-screen bg-background p-6 text-foreground">
-                <div className="mx-auto max-w-6xl">
+            <main className="min-h-screen bg-background text-foreground">
+                <ShopNavigation cartItemCount={cartItemCount} />
+
+                <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div>
                             <Link
                                 href="/cart"
                                 className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                             >
-                                ← Back to cart
+                                ← {t('checkout.backToCart')}
                             </Link>
 
                             <h1 className="mt-3 text-3xl font-bold">
-                                Checkout
+                                {t('checkout.title')}
                             </h1>
 
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Pay cash on delivery. Your order will be saved in our system and reviewed by admin.
+                                {t('checkout.subtitle')}
                             </p>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            {auth.user?.id && <NotificationBell />}
                         </div>
                     </div>
 
@@ -104,17 +232,18 @@ export default function CheckoutIndex({
                         <section className="space-y-6">
                             <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
                                 <h2 className="text-lg font-semibold">
-                                    Customer information
+                                    {t('checkout.customerInfo')}
                                 </h2>
 
-                                <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                                    <label className="block sm:col-span-2">
+                                <div className="mt-5 space-y-5">
+                                    <label className="block">
                                         <span className="text-sm font-medium">
-                                            Full name
+                                            {t('checkout.fullName')} <span className="text-destructive">*</span>
                                         </span>
 
                                         <input
                                             type="text"
+                                            required
                                             value={form.data.customer_name}
                                             onChange={(event) =>
                                                 form.setData(
@@ -123,6 +252,7 @@ export default function CheckoutIndex({
                                                 )
                                             }
                                             className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring"
+                                            placeholder={t('checkout.fullNamePlaceholder')}
                                             autoComplete="name"
                                         />
 
@@ -135,11 +265,12 @@ export default function CheckoutIndex({
 
                                     <label className="block">
                                         <span className="text-sm font-medium">
-                                            Phone number
+                                            {t('checkout.phoneNumber')} <span className="text-destructive">*</span>
                                         </span>
 
                                         <input
                                             type="tel"
+                                            required
                                             value={form.data.customer_phone}
                                             onChange={(event) =>
                                                 form.setData(
@@ -148,7 +279,7 @@ export default function CheckoutIndex({
                                                 )
                                             }
                                             className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring"
-                                            placeholder="06XXXXXXXX"
+                                            placeholder={t('checkout.phoneNumberPlaceholder')}
                                             autoComplete="tel"
                                         />
 
@@ -158,140 +289,20 @@ export default function CheckoutIndex({
                                             </p>
                                         )}
                                     </label>
-
-                                    <label className="block">
-                                        <span className="text-sm font-medium">
-                                            Email <span className="text-muted-foreground">(optional)</span>
-                                        </span>
-
-                                        <input
-                                            type="email"
-                                            value={form.data.customer_email}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'customer_email',
-                                                    event.target.value,
-                                                )
-                                            }
-                                            className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring"
-                                            autoComplete="email"
-                                        />
-
-                                        {form.errors.customer_email && (
-                                            <p className="mt-1 text-sm text-destructive">
-                                                {form.errors.customer_email}
-                                            </p>
-                                        )}
-                                    </label>
                                 </div>
                             </div>
 
-                            <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
-                                <h2 className="text-lg font-semibold">
-                                    Delivery information
-                                </h2>
-
-                                <div className="mt-5 space-y-5">
-                                    <label className="block">
-                                        <span className="text-sm font-medium">
-                                            Delivery zone
-                                        </span>
-
-                                        <select
-                                            value={form.data.delivery_zone_id}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'delivery_zone_id',
-                                                    event.target.value,
-                                                )
-                                            }
-                                            className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring"
-                                        >
-                                            <option value="">
-                                                Select your city and zone
-                                            </option>
-
-                                            {deliveryZones.map((zone) => (
-                                                <option key={zone.id} value={zone.id}>
-                                                    {zone.city} · {zone.district} ·{' '}
-                                                    {zone.zone_name} —{' '}
-                                                    {formatMad(zone.delivery_fee_mad)}
-                                                </option>
-                                            ))}
-                                        </select>
-
-                                        {form.errors.delivery_zone_id && (
-                                            <p className="mt-1 text-sm text-destructive">
-                                                {form.errors.delivery_zone_id}
-                                            </p>
-                                        )}
-
-                                        {selectedZone && (
-                                            <p className="mt-2 text-sm text-muted-foreground">
-                                                {selectedZone.estimated_delivery_days
-                                                    ? `Estimated delivery: ${selectedZone.estimated_delivery_days} day(s).`
-                                                    : 'Estimated delivery time will be confirmed by the shop.'}
-                                            </p>
-                                        )}
-                                    </label>
-
-                                    <label className="block">
-                                        <span className="text-sm font-medium">
-                                            Full delivery address
-                                        </span>
-
-                                        <textarea
-                                            rows="4"
-                                            value={form.data.delivery_address}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'delivery_address',
-                                                    event.target.value,
-                                                )
-                                            }
-                                            className="mt-2 w-full resize-y rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring"
-                                            placeholder="Building, street, apartment, landmark..."
-                                            autoComplete="street-address"
-                                        />
-
-                                        {form.errors.delivery_address && (
-                                            <p className="mt-1 text-sm text-destructive">
-                                                {form.errors.delivery_address}
-                                            </p>
-                                        )}
-                                    </label>
-
-                                    <label className="block">
-                                        <span className="text-sm font-medium">
-                                            Delivery note <span className="text-muted-foreground">(optional)</span>
-                                        </span>
-
-                                        <textarea
-                                            rows="3"
-                                            value={form.data.customer_note}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'customer_note',
-                                                    event.target.value,
-                                                )
-                                            }
-                                            className="mt-2 w-full resize-y rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring"
-                                            placeholder="Call before delivery, door details..."
-                                        />
-
-                                        {form.errors.customer_note && (
-                                            <p className="mt-1 text-sm text-destructive">
-                                                {form.errors.customer_note}
-                                            </p>
-                                        )}
-                                    </label>
-                                </div>
-                            </div>
+                            <DeliveryDetailsSection
+                                form={form}
+                                deliveryZones={deliveryZones}
+                                selectedZone={selectedZone}
+                                t={t}
+                            />
                         </section>
 
                         <aside className="h-fit rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
                             <h2 className="text-lg font-semibold">
-                                Order summary
+                                {t('checkout.orderSummary')}
                             </h2>
 
                             <div className="mt-5 space-y-4">
@@ -321,7 +332,7 @@ export default function CheckoutIndex({
                             <div className="mt-6 space-y-3 border-t border-border pt-5 text-sm">
                                 <div className="flex justify-between gap-4">
                                     <span className="text-muted-foreground">
-                                        Products subtotal
+                                        {t('checkout.productsSubtotal')}
                                     </span>
 
                                     <span className="font-medium">
@@ -331,7 +342,7 @@ export default function CheckoutIndex({
 
                                 <div className="flex justify-between gap-4">
                                     <span className="text-muted-foreground">
-                                        Delivery fee
+                                        {t('checkout.deliveryFee')}
                                     </span>
 
                                     <span className="font-medium">
@@ -339,12 +350,12 @@ export default function CheckoutIndex({
                                             ? formatMad(
                                                   selectedZone.delivery_fee_mad,
                                               )
-                                            : 'Select a zone'}
+                                            : t('checkout.selectZone')}
                                     </span>
                                 </div>
 
                                 <div className="flex justify-between gap-4 border-t border-border pt-4 text-base font-bold">
-                                    <span>Estimated COD total</span>
+                                    <span>{t('checkout.estimatedTotal')}</span>
 
                                     <span>
                                         {estimatedTotal === null
@@ -355,9 +366,7 @@ export default function CheckoutIndex({
                             </div>
 
                             <p className="mt-4 text-xs leading-5 text-muted-foreground">
-                                The final price, delivery fee, stock, and COD
-                                amount are recalculated by Morocco Shop when
-                                the order is created.
+                                {t('checkout.finalPriceNote')}
                             </p>
 
                             <button
@@ -366,10 +375,10 @@ export default function CheckoutIndex({
                                 className="mt-6 w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                             >
                                 {form.processing
-                                    ? 'Creating order...'
+                                    ? t('checkout.placingOrder')
                                     : estimatedTotal !== null
-                                    ? `Create order for admin confirmation — ${formatMad(estimatedTotal)}`
-                                    : 'Create order for admin confirmation'}
+                                    ? `${t('checkout.confirmOrder')} — ${formatMad(estimatedTotal)}`
+                                    : t('checkout.confirmOrder')}
                             </button>
                         </aside>
                     </form>
@@ -411,17 +420,17 @@ export default function CheckoutIndex({
 
                                 <div className="text-center text-white">
                                     <h2 className="text-3xl font-semibold tracking-tight">
-                                        Order Confirmed
+                                        {t('checkout.orderConfirmed')}
                                     </h2>
                                     <p className="mx-auto mt-4 max-w-md text-sm text-slate-300">
-                                        Thank you for your purchase. We&apos;ve started preparing your order.
+                                        {t('checkout.thankYou')}
                                     </p>
                                 </div>
 
                                 {orderNumber && (
                                     <div className="mt-8 border-t border-white/10 pt-6 text-center text-sm text-slate-300">
                                         <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                                            Order Number
+                                            {t('checkout.orderNumber')}
                                         </p>
                                         <p className="mt-2 font-semibold tracking-[0.3em] text-white">
                                             {orderNumber}
@@ -435,7 +444,7 @@ export default function CheckoutIndex({
                                         onClick={closeModal}
                                         className="inline-flex items-center justify-center rounded-full bg-white px-8 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
                                     >
-                                        Continue Shopping
+                                        {t('checkout.continueShopping')}
                                     </button>
                                 </div>
                             </div>

@@ -6,7 +6,19 @@ import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
-import { disable, enable } from '@/routes/two-factor';
+const enable = {
+  form: () => ({
+    action: '/user/two-factor-authentication',
+    method: 'post',
+  }),
+};
+
+const disable = {
+  form: () => ({
+    action: '/user/two-factor-authentication',
+    method: 'delete',
+  }),
+};
 
 
 

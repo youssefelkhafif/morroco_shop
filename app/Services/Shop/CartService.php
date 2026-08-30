@@ -128,9 +128,7 @@ class CartService
                 'quantity' => $safeQuantity,
                 'line_total_mad' => $this->centsToMoney($lineTotalCents),
                 'stock_quantity' => $product->stock_quantity,
-                'image_url' => $firstImage
-                    ? Storage::disk('public')->url($firstImage->path)
-                    : null,
+                'image_url' => $firstImage?->url,
                 'color_id' => $selectedColor?->id,
                 'color_name' => $selectedColor?->name,
                 'color_hex' => $selectedColor?->hex_code,

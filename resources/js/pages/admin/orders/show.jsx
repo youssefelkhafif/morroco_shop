@@ -345,7 +345,7 @@ export default function ShowOrder({ order }) {
                                     </div>
 
                                     <div className="flex justify-between gap-4 border-t border-border pt-3 text-base font-bold">
-                                        <dt>COD to collect</dt>
+                                        <dt>Cash on Delivery Total</dt>
                                         <dd>
                                             {formatMad(order.cod_amount_mad)}
                                         </dd>

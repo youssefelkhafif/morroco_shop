@@ -8,6 +8,7 @@ use App\Models\DeliveryZone;
 use App\Services\Orders\OrderService;
 use App\Services\Shop\CartService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,8 +17,12 @@ class CheckoutController extends Controller
     public function index(CartService $cartService): Response|RedirectResponse
     {
         $cart = $cartService->summary();
+        $orderPlaced = (bool) session()->get('orderPlaced', false);
+        $orderNumber = session()->get('orderNumber');
+        $orderTotal = session()->get('orderTotal');
+        $success = session()->get('success');
 
-        if ($cart['items'] === []) {
+        if (! $orderPlaced && $cart['items'] === []) {
             return to_route('cart.index')
                 ->with('error', 'Your cart is empty.');
         }
@@ -42,6 +47,10 @@ class CheckoutController extends Controller
         return Inertia::render('shop/checkout/index', [
             'cart' => $cart,
             'delivery_zones' => $deliveryZones,
+            'orderPlaced' => $orderPlaced,
+            'orderNumber' => $orderNumber,
+            'orderTotal' => $orderTotal,
+            'success' => $success,
         ]);
     }
 
@@ -68,6 +77,26 @@ class CheckoutController extends Controller
 
         $cartService->clear();
 
+        $orderTotal = (float) $order->total_mad;
+
+        if (config('services.meta.pixel_id') && config('services.meta.access_token')) {
+            Http::post('https://graph.facebook.com/v19.0/'.config('services.meta.pixel_id').'/events?access_token='.config('services.meta.access_token'), [
+                'data' => [[
+                    'event_name' => 'Purchase',
+                    'event_time' => now()->timestamp,
+                    'action_source' => 'website',
+                    'user_data' => [
+                        'client_ip_address' => request()->ip(),
+                        'client_user_agent' => request()->userAgent(),
+                    ],
+                    'custom_data' => [
+                        'currency' => 'MAD',
+                        'value' => $orderTotal,
+                    ],
+                ]],
+            ]);
+        }
+
         $deliveryZones = DeliveryZone::query()
             ->where('is_active', true)
             ->orderBy('city')
@@ -85,12 +114,10 @@ class CheckoutController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('shop/checkout/index', [
-            'cart' => $cart,
-            'delivery_zones' => $deliveryZones,
-            'orderPlaced' => true,
-            'orderNumber' => $order->order_number,
-            'success' => 'Your order has been received. Admin will confirm it soon.',
-        ]);
+        return to_route('checkout.index')
+            ->with('success', 'Your order has been received. Admin will confirm it soon.')
+            ->with('orderPlaced', true)
+            ->with('orderNumber', $order->order_number)
+            ->with('orderTotal', $order->total_mad);
     }
 }

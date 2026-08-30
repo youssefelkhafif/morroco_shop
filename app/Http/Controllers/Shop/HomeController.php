@@ -7,7 +7,6 @@ use App\Models\Product;
 use App\Models\Theme;
 use App\Models\Collection;
 use App\Services\Shop\CartService;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -34,11 +33,7 @@ class HomeController extends Controller
                 'stock_quantity' => $product->stock_quantity,
                 'is_featured' => $product->is_featured,
                 'category_name' => $product->category?->name,
-                'image_url' => $product->images->first()
-                    ? Storage::disk('public')->url(
-                        $product->images->first()->path,
-                    )
-                    : null,
+                'image_url' => $product->images->first()?->url,
             ]);
 
         $themes = Theme::where('is_active', true)

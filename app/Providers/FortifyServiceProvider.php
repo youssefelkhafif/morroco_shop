@@ -36,6 +36,8 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
 
+        Fortify::ignoreRoutes();
+
         Fortify::loginView(fn() => Inertia::render('auth/login'));
 
         Fortify::registerView(fn() => Inertia::render('auth/register'));

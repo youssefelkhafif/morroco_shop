@@ -10,7 +10,7 @@ import { useSyncExternalStore } from 'react';
 
 
 const listeners = new Set();
-let currentAppearance = 'system';
+let currentAppearance = 'light';
 
 const prefersDark = () => {
   if (typeof window === 'undefined') {
@@ -18,6 +18,14 @@ const prefersDark = () => {
   }
 
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
+};
+
+const normalizeAppearance = (appearance) => {
+  if (appearance === 'dark') {
+    return 'dark';
+  }
+
+  return 'light';
 };
 
 const setCookie = (name, value, days = 365) => {
@@ -31,14 +39,24 @@ const setCookie = (name, value, days = 365) => {
 
 const getStoredAppearance = () => {
   if (typeof window === 'undefined') {
-    return 'system';
+    return 'light';
   }
 
-  return localStorage.getItem('appearance') || 'system';
+  const storedAppearance = localStorage.getItem('appearance');
+
+  if (storedAppearance === 'dark' || storedAppearance === 'light') {
+    return normalizeAppearance(storedAppearance);
+  }
+
+  const fallbackAppearance = prefersDark() ? 'dark' : 'light';
+  localStorage.setItem('appearance', fallbackAppearance);
+  localStorage.setItem('darkMode', String(fallbackAppearance === 'dark'));
+
+  return fallbackAppearance;
 };
 
 const isDarkMode = (appearance) => {
-  return appearance === 'dark' || appearance === 'system' && prefersDark();
+  return normalizeAppearance(appearance) === 'dark';
 };
 
 const applyTheme = (appearance) => {
@@ -75,15 +93,15 @@ export function initializeTheme() {
     return;
   }
 
-  if (!localStorage.getItem('appearance')) {
-    localStorage.setItem('appearance', 'system');
-    setCookie('appearance', 'system');
-  }
+  const storedAppearance = getStoredAppearance();
+  localStorage.setItem('appearance', storedAppearance);
+  localStorage.setItem('darkMode', String(storedAppearance === 'dark'));
+  setCookie('appearance', storedAppearance);
 
-  currentAppearance = getStoredAppearance();
+  currentAppearance = storedAppearance;
   applyTheme(currentAppearance);
+  notify();
 
-  // Set up system theme change listener
   mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
@@ -99,15 +117,14 @@ export function useAppearance() {
   'light';
 
   const updateAppearance = (mode) => {
-    currentAppearance = mode;
+    const nextAppearance = normalizeAppearance(mode);
+    currentAppearance = nextAppearance;
 
-    // Store in localStorage for client-side persistence...
-    localStorage.setItem('appearance', mode);
+    localStorage.setItem('appearance', nextAppearance);
+    localStorage.setItem('darkMode', String(nextAppearance === 'dark'));
+    setCookie('appearance', nextAppearance);
 
-    // Store in cookie for SSR...
-    setCookie('appearance', mode);
-
-    applyTheme(mode);
+    applyTheme(nextAppearance);
     notify();
   };
 

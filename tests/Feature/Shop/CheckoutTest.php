@@ -107,6 +107,38 @@ it('creates a guest order from session cart and saves the order for admin confir
     expect($product->fresh()->stock_quantity)->toBe(10);
 });
 
+it('exposes the order total for purchase tracking on checkout success', function () {
+    $product = Product::factory()->create([
+        'price_mad' => '499.99',
+        'stock_quantity' => 4,
+        'is_active' => true,
+    ]);
+
+    $zone = DeliveryZone::factory()->create([
+        'delivery_fee_mad' => '25.00',
+        'is_active' => true,
+    ]);
+
+    $response = $this->withSession([
+            'morocco_shop.cart' => [
+                $product->id => 1,
+            ],
+        ])
+        ->post(route('checkout.store'), checkoutPayload($zone));
+
+    $response->assertRedirect(route('checkout.index'))
+        ->assertSessionHas('orderPlaced', true);
+
+    $this->withSession(session()->all())
+        ->get(route('checkout.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('shop/checkout/index')
+            ->where('orderPlaced', true)
+            ->where('orderTotal', '524.99'),
+        );
+});
+
 it('links an authenticated customer to the created checkout order', function () {
     $customer = User::factory()->create([
         'email' => 'customer@example.test',
